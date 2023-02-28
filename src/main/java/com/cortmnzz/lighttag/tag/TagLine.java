@@ -1,9 +1,13 @@
 package com.cortmnzz.lighttag.tag;
 
-public class TagLine {
-    private final String text;
+import org.bukkit.entity.Player;
 
-    public TagLine(String text) {
+import java.util.function.Function;
+
+public class TagLine {
+    private final Function<Player, String> text;
+
+    public TagLine(Function<Player, String> text) {
         this.text = text;
     }
 }
