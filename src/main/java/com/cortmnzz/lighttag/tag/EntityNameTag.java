@@ -17,6 +17,10 @@ public class EntityNameTag {
     private final Entity entity;
     private final List<TagLine> tagLineList;
 
+    private PacketContainer packet;
+    private WrappedDataWatcher dataWatcher;
+    private PacketContainer mountPacket;
+
     public EntityNameTag(Entity entity) {
         this.entity = entity;
         this.tagLineList = new ArrayList<>();
@@ -24,9 +28,12 @@ public class EntityNameTag {
     public void addTagLine(Function<Player, String> function) {
         this.tagLineList.add(new TagLine(function));
     }
-    public void apply() {
+    public void applyAll() {
+        PlayerManager.doGlobally(this::apply);
+    }
+    public void apply(Player player) {
         this.tagLineList.forEach(line -> {
-            PacketContainer packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.SPAWN_ENTITY_LIVING);
+            packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.SPAWN_ENTITY_LIVING);
             packet.getIntegers().write(0, 0);
             packet.getIntegers().write(1, (int) EntityType.ARMOR_STAND.getTypeId());
             packet.getIntegers().write(2, (int) (entity.getLocation().getX() * 32D));
@@ -36,28 +43,26 @@ public class EntityNameTag {
             packet.getIntegers().write(6, 0);
             packet.getIntegers().write(7, 0);
 
-            WrappedDataWatcher dataWatcher = new WrappedDataWatcher();
+            dataWatcher = new WrappedDataWatcher();
             dataWatcher.setObject(0, (byte) 0x20);
             dataWatcher.setObject(3, (byte) 1);
             dataWatcher.setObject(4, WrappedDataWatcher.Registry.get(Byte.class), (byte) 1);
 
-            PacketContainer mountPacket = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.MOUNT);
+            mountPacket = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.MOUNT);
             mountPacket.getIntegers().write(0, 0);
             mountPacket.getIntegerArrays().write(0, new int[] {entity.getEntityId()});
 
-            PlayerManager.doGlobally(player -> {
-                String text = line.getText().apply(player);
+            String text = line.getText().apply(player);
 
-                dataWatcher.setObject(2, text);
-                packet.getDataWatcherModifier().write(0, dataWatcher);
+            dataWatcher.setObject(2, text);
+            packet.getDataWatcherModifier().write(0, dataWatcher);
 
-                try {
-                    ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet);
-                    ProtocolLibrary.getProtocolManager().sendServerPacket(player, mountPacket);
-                } catch (Exception exception) {
-                    exception.printStackTrace();
-                }
-            });
+            try {
+                ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet);
+                ProtocolLibrary.getProtocolManager().sendServerPacket(player, mountPacket);
+            } catch (Exception exception) {
+                exception.printStackTrace();
+            }
         });
     }
 }
