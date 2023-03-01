@@ -31,17 +31,17 @@ public class EntityNameTag {
     public void applyAll() {
         NameTagManager.doGlobally(this::apply);
     }
-    public void apply(Entity entity) {
-        if (entity instanceof Player) {
-            Player player = (Player) entity;
+    public void apply(Entity target) {
+        if (target instanceof Player) {
+            Player player = (Player) target;
 
             this.tagLineList.forEach(line -> {
                 packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.SPAWN_ENTITY_LIVING);
                 packet.getIntegers().write(0, 0);
                 packet.getIntegers().write(1, (int) EntityType.ARMOR_STAND.getTypeId());
-                packet.getIntegers().write(2, (int) (player.getLocation().getX() * 32D));
-                packet.getIntegers().write(3, (int) (player.getLocation().getY() * 32D));
-                packet.getIntegers().write(4, (int) (player.getLocation().getZ() * 32D));
+                packet.getIntegers().write(2, (int) (entity.getLocation().getX() * 32D));
+                packet.getIntegers().write(3, (int) (entity.getLocation().getY() * 32D));
+                packet.getIntegers().write(4, (int) (entity.getLocation().getZ() * 32D));
                 packet.getIntegers().write(5, 0);
                 packet.getIntegers().write(6, 0);
                 packet.getIntegers().write(7, 0);
@@ -53,7 +53,7 @@ public class EntityNameTag {
 
                 mountPacket = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.MOUNT);
                 mountPacket.getIntegers().write(0, 0);
-                mountPacket.getIntegerArrays().write(0, new int[] {player.getEntityId()});
+                mountPacket.getIntegerArrays().write(0, new int[] {entity.getEntityId()});
 
                 String text = line.getText().apply(player);
 
