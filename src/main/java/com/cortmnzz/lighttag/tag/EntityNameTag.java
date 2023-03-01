@@ -4,7 +4,7 @@ import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
-import com.cortmnzz.lighttag.manager.PlayerManager;
+import com.cortmnzz.lighttag.manager.NameTagManager;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -29,7 +29,7 @@ public class EntityNameTag {
         this.tagLineList.add(new TagLine(function));
     }
     public void applyAll() {
-        PlayerManager.doGlobally(this::apply);
+        NameTagManager.doGlobally(this::apply);
     }
     public void apply(Player player) {
         this.tagLineList.forEach(line -> {
