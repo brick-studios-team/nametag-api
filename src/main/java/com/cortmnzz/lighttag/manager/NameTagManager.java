@@ -2,6 +2,7 @@ package com.cortmnzz.lighttag.manager;
 
 import com.cortmnzz.lighttag.tag.EntityNameTag;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 import java.util.function.Consumer;
@@ -17,5 +18,8 @@ public class NameTagManager {
     }
     public static void doGlobally(Consumer<Entity> consumer) {
         entityNameTagHashMap.forEach((key, value) -> consumer.accept(key));
+    }
+    public static void doGlobally(Player player, Consumer<Entity> consumer) {
+        entityNameTagHashMap.keySet().stream().filter(target -> target != player).forEach(consumer);
     }
 }
