@@ -31,6 +31,8 @@ public class EntityNameTag {
     public void applyAll() {
         NameTagManager.doGlobally(this::apply);
     }
+
+    @SuppressWarnings("deprecation")
     public void apply(Entity target) {
         if (target instanceof Player) {
             Player player = (Player) target;
