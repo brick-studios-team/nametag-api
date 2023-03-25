@@ -3,11 +3,15 @@ package com.cortmnzz.lighttag.tag;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.PacketContainer;
+import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
+import com.comphenix.protocol.wrappers.WrappedWatchableObject;
 import com.cortmnzz.lighttag.manager.NameTagManager;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,8 +29,9 @@ public class EntityNameTag {
         this.entity = entity;
         this.tagLineList = new ArrayList<>();
     }
-    public void addTagLine(Function<Player, String> function) {
+    public EntityNameTag addTagLine(Function<Player, String> function) {
         this.tagLineList.add(new TagLine(function));
+        return this;
     }
     public void applyAll() {
         NameTagManager.doGlobally(this::apply);
@@ -39,27 +44,21 @@ public class EntityNameTag {
 
             this.tagLineList.forEach(line -> {
                 packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.SPAWN_ENTITY_LIVING);
-                packet.getIntegers().write(0, 0);
-                packet.getIntegers().write(1, (int) EntityType.ARMOR_STAND.getTypeId());
-                packet.getIntegers().write(2, (int) (entity.getLocation().getX() * 32D));
-                packet.getIntegers().write(3, (int) (entity.getLocation().getY() * 32D));
-                packet.getIntegers().write(4, (int) (entity.getLocation().getZ() * 32D));
-                packet.getIntegers().write(5, 0);
-                packet.getIntegers().write(6, 0);
-                packet.getIntegers().write(7, 0);
-
-                dataWatcher = new WrappedDataWatcher();
-                dataWatcher.setObject(0, (byte) 0x20);
-                dataWatcher.setObject(3, (byte) 1);
-                dataWatcher.setObject(4, WrappedDataWatcher.Registry.get(Byte.class), (byte) 1);
-
-                mountPacket = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.MOUNT);
-                mountPacket.getIntegers().write(0, 0);
-                mountPacket.getIntegerArrays().write(0, new int[] {entity.getEntityId()});
-
-                String text = line.getText().apply(player);
-
-                dataWatcher.setObject(2, text);
+                ArmorStand armorStand = (ArmorStand) player.getWorld().spawnEntity(player.getLocation(), EntityType.ARMOR_STAND);
+                armorStand.setGravity(false);
+                armorStand.setSmall(true);
+                armorStand.setVisible(false);
+                armorStand.setMarker(true);
+                WrappedDataWatcher dataWatcher = new WrappedDataWatcher();
+                WrappedDataWatcher.WrappedDataWatcherObject slimeSizeIndex = new WrappedDataWatcher.WrappedDataWatcherObject(15, WrappedDataWatcher.Registry.get(Byte.class));
+                dataWatcher.setObject(slimeSizeIndex, (byte) 2);
+                WrappedWatchableObject slimeSize = new WrappedWatchableObject(slimeSizeIndex, (byte) 2);
+                packet.getIntegers().write(0, armorStand.getEntityId());
+                packet.getEntityUseActions().write(0, EnumWrappers.EntityUseAction.INTERACT_AT);
+                packet.getHands().write(0, EnumWrappers.Hand.MAIN_HAND);
+                packet.getModifier().write(1, armorStand.getLocation().toVector());
+                packet.getBooleans().write(0, true);
+                packet.getEntityUseActions().write(0, EnumWrappers.EntityUseAction.INTERACT);
                 packet.getDataWatcherModifier().write(0, dataWatcher);
 
                 try {

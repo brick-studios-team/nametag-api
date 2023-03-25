@@ -3,3 +3,5 @@ version: '${project.version}'
 main: com.cortmnzz.lighttag.LightTag
 api-version: 1.19
 authors: [ Ailakks ]
+
+depend: [ProtocolLib]

@@ -11,6 +11,6 @@ public class PlayerJoinListener implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
-        NameTagManager.get(player).applyAll();
+        NameTagManager.get(player).addTagLine(target -> "example").applyAll();
     }
 }
