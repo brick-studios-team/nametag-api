@@ -45,16 +45,16 @@ public class EntityNameTag {
                 WrapperPlayServerSpawnEntityLiving slimeEntityPacket = new WrapperPlayServerSpawnEntityLiving(new PacketContainer(PacketType.Play.Server.SPAWN_ENTITY_LIVING));
                 slimeEntityPacket.setEntityID(EntityType.SLIME.getTypeId());
 
-                WrapperPlayServerMount mountArmorStandPacket = new WrapperPlayServerMount(new PacketContainer(PacketType.Play.Server.MOUNT));
-                mountArmorStandPacket.setPassengerIds(new int[] { armorStandEntityPacket.getEntityID(), slimeEntityPacket.getEntityID() });
+                WrapperPlayServerMount attachEntityArmorStandPacket = new WrapperPlayServerMount(new PacketContainer(PacketType.Play.Server.ATTACH_ENTITY));
+                attachEntityArmorStandPacket.setPassengerIds(new int[] { armorStandEntityPacket.getEntityID(), slimeEntityPacket.getEntityID() });
 
-                WrapperPlayServerMount mountSlimePacket = new WrapperPlayServerMount(new PacketContainer(PacketType.Play.Server.MOUNT));
-                mountSlimePacket.setPassengerIds(new int[] { slimeEntityPacket.getEntityID(), tagPlayer.getBukkitPlayer().getEntityId() });
+                WrapperPlayServerMount attachEntitySlimePacket = new WrapperPlayServerMount(new PacketContainer(PacketType.Play.Server.ATTACH_ENTITY));
+                attachEntitySlimePacket.setPassengerIds(new int[] { slimeEntityPacket.getEntityID(), tagPlayer.getBukkitPlayer().getEntityId() });
 
                 armorStandEntityPacket.broadcastPacket();
                 slimeEntityPacket.broadcastPacket();
-                mountArmorStandPacket.broadcastPacket();
-                mountSlimePacket.broadcastPacket();
+                attachEntityArmorStandPacket.broadcastPacket();
+                attachEntitySlimePacket.broadcastPacket();
             });
         }
     }
