@@ -4,6 +4,7 @@ import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketContainer;
 import com.cortmnzz.lighttag.manager.NameTagManager;
 import com.cortmnzz.lighttag.manager.TagPlayerManager;
+import com.cortmnzz.lighttag.packet.WrapperPlayServerAttachEntity;
 import com.cortmnzz.lighttag.packet.WrapperPlayServerMount;
 import com.cortmnzz.lighttag.packet.WrapperPlayServerSpawnEntityLiving;
 import com.cortmnzz.lighttag.player.TagPlayer;
@@ -45,11 +46,13 @@ public class EntityNameTag {
                 WrapperPlayServerSpawnEntityLiving slimeEntityPacket = new WrapperPlayServerSpawnEntityLiving(new PacketContainer(PacketType.Play.Server.SPAWN_ENTITY_LIVING));
                 slimeEntityPacket.setEntityID(EntityType.SLIME.getTypeId());
 
-                WrapperPlayServerMount attachEntityArmorStandPacket = new WrapperPlayServerMount(new PacketContainer(PacketType.Play.Server.ATTACH_ENTITY));
-                attachEntityArmorStandPacket.setPassengerIds(new int[] { armorStandEntityPacket.getEntityID(), slimeEntityPacket.getEntityID() });
+                WrapperPlayServerAttachEntity attachEntityArmorStandPacket = new WrapperPlayServerAttachEntity(new PacketContainer(PacketType.Play.Server.ATTACH_ENTITY));
+                attachEntityArmorStandPacket.setEntityID(armorStandEntityPacket.getEntityID());
+                attachEntityArmorStandPacket.setVehicleId(slimeEntityPacket.getEntityID());
 
-                WrapperPlayServerMount attachEntitySlimePacket = new WrapperPlayServerMount(new PacketContainer(PacketType.Play.Server.ATTACH_ENTITY));
-                attachEntitySlimePacket.setPassengerIds(new int[] { slimeEntityPacket.getEntityID(), tagPlayer.getBukkitPlayer().getEntityId() });
+                WrapperPlayServerAttachEntity attachEntitySlimePacket = new WrapperPlayServerAttachEntity(new PacketContainer(PacketType.Play.Server.ATTACH_ENTITY));
+                attachEntitySlimePacket.setEntityID(slimeEntityPacket.getEntityID());
+                attachEntitySlimePacket.setVehicleId(tagPlayer.getBukkitPlayer().getEntityId());
 
                 armorStandEntityPacket.broadcastPacket();
                 slimeEntityPacket.broadcastPacket();
