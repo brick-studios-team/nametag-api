@@ -8,7 +8,7 @@
  * @created : 26/03/2023
  */
 
-package com.cortmnzz.lighttag.listeners;
+package com.cortmnzz.lighttag.listeners.bukkit;
 
 import com.cortmnzz.lighttag.manager.TagPlayerManager;
 import com.cortmnzz.lighttag.player.TagPlayer;
