@@ -2,11 +2,15 @@ package com.cortmnzz.lighttag.tag;
 
 import com.cortmnzz.lighttag.manager.NameTagManager;
 import net.minecraft.server.v1_8_R3.EntityArmorStand;
+import net.minecraft.server.v1_8_R3.EntitySlime;
 import net.minecraft.server.v1_8_R3.PacketPlayOutAttachEntity;
 import net.minecraft.server.v1_8_R3.PacketPlayOutSpawnEntityLiving;
+import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -36,19 +40,28 @@ public class EntityNameTag {
             Player player = (Player) target;
 
             this.tagLineList.forEach(line -> {
-                EntityArmorStand entityArmorStand = new EntityArmorStand(((CraftWorld) player.getWorld()).getHandle(),
-                        player.getLocation().getX(),
-                        player.getLocation().getY(),
-                        player.getLocation().getZ());
+                Location location = player.getLocation();
+
+                EntitySlime entitySlime = new EntitySlime(((CraftWorld) player.getWorld()).getHandle());
+                entitySlime.setInvisible(true);
+                entitySlime.setSize(-1);
+                entitySlime.mount(((CraftEntity) player).getHandle());
+                entitySlime.mount(((CraftEntity) player).getHandle());
+
+                EntityArmorStand entityArmorStand = new EntityArmorStand(((CraftWorld) player.getWorld()).getHandle());
+
                 entityArmorStand.setInvisible(true);
                 entityArmorStand.setCustomNameVisible(true);
+                entityArmorStand.setSmall(true);
                 entityArmorStand.setCustomName(line.getText().apply(player));
+                entityArmorStand.setLocation(location.getX(), location.getY(), location.getZ(), 0, 0);
+                entityArmorStand.mount(entitySlime);
 
-                PacketPlayOutSpawnEntityLiving packetPlayOutSpawnEntityLiving = new PacketPlayOutSpawnEntityLiving(entityArmorStand);
-                PacketPlayOutAttachEntity packetPlayOutAttachEntity = new PacketPlayOutAttachEntity(0, entityArmorStand, ((CraftPlayer) player).getHandle());
+                //PacketPlayOutAttachEntity packetPlayOutAttachEntity = new PacketPlayOutAttachEntity(0, entityArmorStand, ((CraftPlayer) player).getHandle());
+                //((CraftPlayer) player).getHandle().playerConnection.sendPacket(packetPlayOutAttachEntity);
 
-                ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packetPlayOutSpawnEntityLiving);
-                ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packetPlayOutAttachEntity);
+                ((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutSpawnEntityLiving(entitySlime));
+                ((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutSpawnEntityLiving(entityArmorStand));
             });
         }
     }
