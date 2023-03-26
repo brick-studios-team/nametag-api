@@ -23,7 +23,7 @@ public class TagPlayer {
     public TagPlayer(Player bukkitPlayer) {
         this.bukkitPlayer = bukkitPlayer;
     }
-    public void applyAll() {
-        TagPlayerManager.doGlobally(target -> target.getEntityNameTag().apply(this.bukkitPlayer));
+    public void applyAll(TagPlayer tagPlayer) {
+        TagPlayerManager.doGlobally(tagPlayer, target -> target.getEntityNameTag().apply(this.bukkitPlayer));
     }
 }

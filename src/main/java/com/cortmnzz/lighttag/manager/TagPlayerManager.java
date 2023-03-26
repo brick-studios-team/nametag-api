@@ -36,4 +36,7 @@ public class TagPlayerManager {
     public static void doGlobally(Consumer<TagPlayer> consumer) {
         getList().forEach(consumer);
     }
+    public static void doGlobally(TagPlayer tagPlayer, Consumer<TagPlayer> consumer) {
+        getList().stream().filter(target -> target != tagPlayer).forEach(consumer);
+    }
 }

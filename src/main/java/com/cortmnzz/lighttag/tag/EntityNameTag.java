@@ -36,8 +36,8 @@ public class EntityNameTag {
         return this;
     }
 
-    public void applyAll() {
-        TagPlayerManager.doGlobally(target -> apply(target.getBukkitPlayer()));
+    public void applyAll(TagPlayer tagPlayer) {
+        TagPlayerManager.doGlobally(tagPlayer, target -> apply(target.getBukkitPlayer()));
     }
 
     public void apply(Entity target) {

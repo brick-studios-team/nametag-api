@@ -12,9 +12,9 @@ public class PlayerJoinListener implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         TagPlayer tagPlayer = TagPlayerManager.get(event.getPlayer());
 
-        tagPlayer.setEntityNameTag(new EntityNameTag(tagPlayer.getBukkitPlayer()));
+        tagPlayer.applyAll(tagPlayer);
 
-        tagPlayer.getEntityNameTag().addTagLine(target -> "example").addTagLine(target -> "example2").applyAll();
-        tagPlayer.applyAll();
+        tagPlayer.setEntityNameTag(new EntityNameTag(tagPlayer.getBukkitPlayer()));
+        tagPlayer.getEntityNameTag().addTagLine(target -> "example").addTagLine(target -> "example2").applyAll(tagPlayer);
     }
 }
