@@ -3,10 +3,7 @@ package com.cortmnzz.lighttag.tag;
 import com.cortmnzz.lighttag.manager.TagPlayerManager;
 import com.cortmnzz.lighttag.player.TagPlayer;
 import lombok.Getter;
-import net.minecraft.server.v1_8_R3.EntityArmorStand;
-import net.minecraft.server.v1_8_R3.EntityPlayer;
-import net.minecraft.server.v1_8_R3.PacketPlayOutEntityTeleport;
-import net.minecraft.server.v1_8_R3.PacketPlayOutSpawnEntityLiving;
+import net.minecraft.server.v1_8_R3.*;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
@@ -19,16 +16,16 @@ import java.util.List;
 import java.util.function.Function;
 
 public class EntityNameTag {
-    @Getter
-    private final Entity entity;
-    @Getter
-    private final List<EntityArmorStand> entityArmorStandList;
+    @Getter private final Entity entity;
+    @Getter private final List<EntityArmorStand> entityArmorStandList;
     private final List<TagLine> tagLineList;
+    private final List<TagPlayer> viewerList;
 
     public EntityNameTag(Entity entity) {
         this.entity = entity;
         this.entityArmorStandList = new ArrayList<>();
         this.tagLineList = new ArrayList<>();
+        this.viewerList = new ArrayList<>();
     }
 
     public EntityNameTag addTagLine(Function<Player, String> function) {
@@ -38,6 +35,25 @@ public class EntityNameTag {
 
     public void applyAll(TagPlayer tagPlayer) {
         TagPlayerManager.doGlobally(tagPlayer, target -> apply(target.getBukkitPlayer()));
+    }
+
+    public void apply(List<TagPlayer> tagPlayerList) {
+        tagPlayerList.forEach(target -> apply(target.getBukkitPlayer()));
+    }
+
+    public void destroyAll(List<TagPlayer> tagPlayerList) {
+        this.viewerList.forEach(target -> destroy(target.getBukkitPlayer()));
+    }
+
+    public void addViewer(TagPlayer tagPlayer) {
+        this.viewerList.add(tagPlayer);
+
+        apply(tagPlayer.getBukkitPlayer());
+    }
+    public void removeViewer(TagPlayer tagPlayer) {
+        this.viewerList.remove(tagPlayer);
+
+        destroy(tagPlayer.getBukkitPlayer());
     }
 
     public void apply(Entity target) {
@@ -79,6 +95,16 @@ public class EntityNameTag {
 
             TagPlayerManager.doGlobally(target -> {
                 ((CraftPlayer) target.getBukkitPlayer()).getHandle().playerConnection.sendPacket(teleportPacket);
+            });
+        }
+    }
+    public void destroy(Entity target) {
+        if (target instanceof Player) {
+            TagPlayer tagPlayer = TagPlayerManager.get((Player) target);
+            EntityPlayer entityPlayer = ((CraftPlayer) tagPlayer.getBukkitPlayer()).getHandle();
+
+            this.entityArmorStandList.forEach(entityArmorStand -> {
+                entityPlayer.playerConnection.sendPacket(new PacketPlayOutEntityDestroy(entityArmorStand.getId()));
             });
         }
     }
