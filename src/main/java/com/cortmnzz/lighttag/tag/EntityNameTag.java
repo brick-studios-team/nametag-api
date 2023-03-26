@@ -44,26 +44,22 @@ public class EntityNameTag {
             this.tagLineList.forEach(line -> {
                 Location location = player.getLocation();
 
-                EntitySlime entitySlime = new EntitySlime(((CraftWorld) player.getWorld()).getHandle());
-                entitySlime.setInvisible(true);
-                entitySlime.setSize(-1);
-
                 PacketContainer slimePacket = new PacketContainer(PacketType.Play.Server.SPAWN_ENTITY_LIVING);
-                slimePacket.getIntegers().write(0, (int) EntityType.ARMOR_STAND.getTypeId());
+                slimePacket.getIntegers().write(0, (int) EntityType.SLIME.getTypeId());
                 slimePacket.getIntegers().write(1, (int) (location.getX() * 32));
                 slimePacket.getIntegers().write(2, (int) (location.getY() * 32));
                 slimePacket.getIntegers().write(3, (int) (location.getZ() * 32));
-                slimePacket.getBytes().write(0, (byte) 0);
+                slimePacket.getIntegers().write(4, 0);
                 ProtocolLibrary.getProtocolManager().broadcastServerPacket(slimePacket);
 
                 int slimeId = slimePacket.getIntegers().read(0);
 
                 PacketContainer armorStandPacket = new PacketContainer(PacketType.Play.Server.SPAWN_ENTITY_LIVING);
-                armorStandPacket.getIntegers().write(0, (int) EntityType.SLIME.getTypeId());
+                armorStandPacket.getIntegers().write(0, (int) EntityType.ARMOR_STAND.getTypeId());
                 armorStandPacket.getIntegers().write(1, (int) (location.getX() * 32));
                 armorStandPacket.getIntegers().write(2, (int) (location.getY() * 32));
                 armorStandPacket.getIntegers().write(3, (int) (location.getZ() * 32));
-                armorStandPacket.getBytes().write(0, (byte) 0);
+                armorStandPacket.getIntegers().write(4, 0);
                 ProtocolLibrary.getProtocolManager().broadcastServerPacket(armorStandPacket);
 
                 int armorStandId = armorStandPacket.getIntegers().read(0);
