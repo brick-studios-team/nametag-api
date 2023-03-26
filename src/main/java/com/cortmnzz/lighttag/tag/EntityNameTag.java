@@ -15,6 +15,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
@@ -41,6 +42,8 @@ public class EntityNameTag {
     }
 
     public void apply(Entity target) {
+        Collections.reverse(this.tagLineList);
+
         if (target instanceof Player) {
             TagPlayer tagPlayer = TagPlayerManager.get((Player) target);
             EntityPlayer entityPlayer = ((CraftPlayer) tagPlayer.getBukkitPlayer()).getHandle();
@@ -63,7 +66,7 @@ public class EntityNameTag {
 
     public void teleport() {
         for (int index = 0; index < this.entityArmorStandList.size(); index++) {
-            Location location = this.entity.getLocation().add(0, index * 0.5, 0);
+            Location location = this.entity.getLocation().add(0, 1, 0).add(0, index * 0.2, 0);
 
             EntityArmorStand entityArmorStand = this.entityArmorStandList.get(index);
 
