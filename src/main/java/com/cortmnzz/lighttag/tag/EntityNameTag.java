@@ -66,7 +66,7 @@ public class EntityNameTag {
 
     public void teleport() {
         for (int index = 0; index < this.entityArmorStandList.size(); index++) {
-            Location location = this.entity.getLocation().add(0, 1, 0).add(0, index * 0.2, 0);
+            Location location = this.entity.getLocation().add(0, 0.8, 0).add(0, index * 0.3, 0);
 
             EntityArmorStand entityArmorStand = this.entityArmorStandList.get(index);
 
