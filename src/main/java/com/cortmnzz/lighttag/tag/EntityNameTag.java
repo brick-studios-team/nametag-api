@@ -9,7 +9,6 @@ import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.scoreboard.NameTagVisibility;
 
 import java.util.ArrayList;
 import java.util.Collections;
