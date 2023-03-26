@@ -4,6 +4,7 @@ import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.PacketContainer;
 import com.cortmnzz.lighttag.manager.NameTagManager;
+import com.cortmnzz.lighttag.packet.wrapper.WrapperPlayServerSpawnEntityLiving;
 import net.minecraft.server.v1_8_R3.*;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
@@ -44,37 +45,27 @@ public class EntityNameTag {
             this.tagLineList.forEach(line -> {
                 Location location = player.getLocation();
 
+                EntitySlime entitySlime = new EntitySlime(((CraftWorld) player.getWorld()).getHandle());
+                entitySlime.setInvisible(true);
+                entitySlime.setSize(-1);
+
                 PacketContainer slimePacket = new PacketContainer(PacketType.Play.Server.SPAWN_ENTITY_LIVING);
-                slimePacket.getIntegers().write(0, (int) EntityType.SLIME.getTypeId());
+                slimePacket.getIntegers().write(0, (int) EntityType.ARMOR_STAND.getTypeId());
                 slimePacket.getIntegers().write(1, (int) (location.getX() * 32));
                 slimePacket.getIntegers().write(2, (int) (location.getY() * 32));
                 slimePacket.getIntegers().write(3, (int) (location.getZ() * 32));
-                slimePacket.getIntegers().write(4, 0);
+                slimePacket.getBytes().write(0, (byte) 0);
                 ProtocolLibrary.getProtocolManager().broadcastServerPacket(slimePacket);
 
-                int slimeId = slimePacket.getIntegers().read(0);
-
                 PacketContainer armorStandPacket = new PacketContainer(PacketType.Play.Server.SPAWN_ENTITY_LIVING);
-                armorStandPacket.getIntegers().write(0, (int) EntityType.ARMOR_STAND.getTypeId());
+                armorStandPacket.getIntegers().write(0, (int) EntityType.SLIME.getTypeId());
                 armorStandPacket.getIntegers().write(1, (int) (location.getX() * 32));
                 armorStandPacket.getIntegers().write(2, (int) (location.getY() * 32));
                 armorStandPacket.getIntegers().write(3, (int) (location.getZ() * 32));
-                armorStandPacket.getIntegers().write(4, 0);
+                armorStandPacket.getBytes().write(0, (byte) 0);
                 ProtocolLibrary.getProtocolManager().broadcastServerPacket(armorStandPacket);
 
-                int armorStandId = armorStandPacket.getIntegers().read(0);
-
-                PacketContainer playerAttachPacket = new PacketContainer(PacketType.Play.Server.ATTACH_ENTITY);
-                playerAttachPacket.getIntegers().write(0, player.getEntityId());
-                playerAttachPacket.getIntegers().write(1, slimeId);
-                playerAttachPacket.getIntegers().write(2, 0);
-                ProtocolLibrary.getProtocolManager().broadcastServerPacket(playerAttachPacket);
-
-                PacketContainer slimeAttachPacket = new PacketContainer(PacketType.Play.Server.ATTACH_ENTITY);
-                slimeAttachPacket.getIntegers().write(0, slimeId);
-                slimeAttachPacket.getIntegers().write(1, armorStandId);
-                slimeAttachPacket.getIntegers().write(2, 0);
-                ProtocolLibrary.getProtocolManager().broadcastServerPacket(slimeAttachPacket);
+                Entity entity = ProtocolLibrary.getProtocolManager().getEntityFromID(player.getWorld(), armorStandPacket.getIntegers().read(0));
             });
         }
     }
