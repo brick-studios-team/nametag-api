@@ -20,7 +20,7 @@ import com.cortmnzz.lighttag.player.TagPlayer;
 
 public class MovePacketListener extends PacketAdapter {
     public MovePacketListener() {
-        super(LightTag.getInstance(), ListenerPriority.NORMAL, PacketType.Play.Client.POSITION);
+        super(LightTag.getInstance(), ListenerPriority.NORMAL, PacketType.Play.Client.POSITION, PacketType.Play.Client.POSITION_LOOK);
     }
 
     @Override
