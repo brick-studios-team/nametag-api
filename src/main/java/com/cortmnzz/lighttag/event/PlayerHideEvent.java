@@ -15,13 +15,17 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
 public final class PlayerHideEvent extends Event {
-    @Getter private static final HandlerList handlers = new HandlerList();
+    private static final HandlerList handlers = new HandlerList();
     @Getter private final TagPlayer tagPlayer;
     @Getter private final TagPlayer target;
 
     public PlayerHideEvent(TagPlayer tagPlayer, TagPlayer target) {
         this.tagPlayer = tagPlayer;
         this.target = target;
+    }
+
+    public HandlerList getHandlers() {
+        return handlers;
     }
 
     public static HandlerList getHandlerList() {

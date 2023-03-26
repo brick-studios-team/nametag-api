@@ -17,6 +17,9 @@ import com.comphenix.protocol.events.PacketEvent;
 import com.cortmnzz.lighttag.LightTag;
 import com.cortmnzz.lighttag.manager.TagPlayerManager;
 import com.cortmnzz.lighttag.player.TagPlayer;
+import com.cortmnzz.lighttag.tag.EntityNameTag;
+
+import java.util.Optional;
 
 public class MovePacketListener extends PacketAdapter {
     public MovePacketListener() {
@@ -27,6 +30,6 @@ public class MovePacketListener extends PacketAdapter {
     public void onPacketReceiving(PacketEvent event) {
         TagPlayer tagPlayer = TagPlayerManager.get(event.getPlayer());
 
-        tagPlayer.getEntityNameTag().teleport();
+        Optional.ofNullable(tagPlayer.getEntityNameTag()).ifPresent(EntityNameTag::teleport);
     }
 }
