@@ -45,6 +45,10 @@ public class EntityNameTag {
         this.viewerList.forEach(target -> destroy(target.getBukkitPlayer()));
     }
 
+    public void destroyAll(TagPlayer tagPlayer) {
+        TagPlayerManager.doGlobally(tagPlayer, target -> destroy(target.getBukkitPlayer()));
+    }
+
     public void addViewer(TagPlayer tagPlayer) {
         this.viewerList.add(tagPlayer);
 
