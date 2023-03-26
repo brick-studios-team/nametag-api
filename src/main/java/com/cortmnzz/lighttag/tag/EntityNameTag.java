@@ -1,6 +1,5 @@
 package com.cortmnzz.lighttag.tag;
 
-import com.cortmnzz.lighttag.manager.NameTagManager;
 import com.cortmnzz.lighttag.manager.TagPlayerManager;
 import com.cortmnzz.lighttag.player.TagPlayer;
 import lombok.Getter;
@@ -38,7 +37,7 @@ public class EntityNameTag {
     }
 
     public void applyAll() {
-        NameTagManager.doGlobally(this::apply);
+        TagPlayerManager.doGlobally(target -> apply(target.getBukkitPlayer()));
     }
 
     public void apply(Entity target) {
