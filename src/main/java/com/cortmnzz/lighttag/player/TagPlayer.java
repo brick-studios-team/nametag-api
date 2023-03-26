@@ -11,8 +11,6 @@ package com.cortmnzz.lighttag.player;
 
 import com.cortmnzz.lighttag.manager.TagPlayerManager;
 import com.cortmnzz.lighttag.tag.EntityNameTag;
-import com.cortmnzz.lighttag.tag.NameTag;
-import lombok.Setter;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import org.bukkit.entity.Player;
@@ -25,6 +23,9 @@ public class TagPlayer {
 
     public TagPlayer(Player bukkitPlayer) {
         this.bukkitPlayer = bukkitPlayer;
+    }
+    public String getName() {
+        return this.bukkitPlayer.getName();
     }
     public void applyAll(TagPlayer tagPlayer) {
         TagPlayerManager.doGlobally(tagPlayer, target -> target.getEntityNameTag().apply(this.bukkitPlayer));
