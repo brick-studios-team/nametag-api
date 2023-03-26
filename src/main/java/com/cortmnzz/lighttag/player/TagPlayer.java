@@ -9,6 +9,7 @@
 
 package com.cortmnzz.lighttag.player;
 
+import com.cortmnzz.lighttag.manager.TagPlayerManager;
 import com.cortmnzz.lighttag.tag.EntityNameTag;
 import lombok.Setter;
 import lombok.Getter;
@@ -21,5 +22,8 @@ public class TagPlayer {
 
     public TagPlayer(Player bukkitPlayer) {
         this.bukkitPlayer = bukkitPlayer;
+    }
+    public void applyAll() {
+        TagPlayerManager.doGlobally(target -> target.getEntityNameTag().apply(this.bukkitPlayer));
     }
 }
