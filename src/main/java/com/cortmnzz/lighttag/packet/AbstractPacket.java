@@ -20,6 +20,7 @@ package com.cortmnzz.lighttag.packet;
 
 import java.lang.reflect.InvocationTargetException;
 
+import lombok.Getter;
 import org.bukkit.entity.Player;
 
 import com.comphenix.protocol.PacketType;

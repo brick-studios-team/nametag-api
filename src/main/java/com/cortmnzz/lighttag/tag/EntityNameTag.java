@@ -5,12 +5,11 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.cortmnzz.lighttag.manager.NameTagManager;
 import com.cortmnzz.lighttag.manager.TagPlayerManager;
 import com.cortmnzz.lighttag.packet.WrapperPlayServerAttachEntity;
-import com.cortmnzz.lighttag.packet.WrapperPlayServerMount;
-import com.cortmnzz.lighttag.packet.WrapperPlayServerSpawnEntityLiving;
 import com.cortmnzz.lighttag.player.TagPlayer;
-import org.bukkit.Location;
+import net.minecraft.server.v1_8_R3.*;
+import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -38,26 +37,36 @@ public class EntityNameTag {
     public void apply(Entity target) {
         if (target instanceof Player) {
             TagPlayer tagPlayer = TagPlayerManager.get((Player) target);
+            EntityPlayer entityPlayer = ((CraftPlayer) tagPlayer.getBukkitPlayer()).getHandle();
 
             this.tagLineList.forEach(line -> {
-                WrapperPlayServerSpawnEntityLiving armorStandEntityPacket = new WrapperPlayServerSpawnEntityLiving(new PacketContainer(PacketType.Play.Server.SPAWN_ENTITY_LIVING));
-                armorStandEntityPacket.setEntityID(EntityType.ARMOR_STAND.getTypeId());
+                EntityArmorStand entityArmorStand = new EntityArmorStand(((CraftWorld) tagPlayer.getBukkitPlayer().getWorld()).getHandle());
+                entityArmorStand.setInvisible(true);
+                entityArmorStand.setCustomNameVisible(true);
+                entityArmorStand.setSmall(true);
+                entityArmorStand.setCustomName(line.getText().apply(tagPlayer.getBukkitPlayer()));
 
-                WrapperPlayServerSpawnEntityLiving slimeEntityPacket = new WrapperPlayServerSpawnEntityLiving(new PacketContainer(PacketType.Play.Server.SPAWN_ENTITY_LIVING));
-                slimeEntityPacket.setEntityID(EntityType.SLIME.getTypeId());
+                EntitySlime entitySlime = new EntitySlime(((CraftWorld) tagPlayer.getBukkitPlayer().getWorld()).getHandle());
+                entitySlime.setInvisible(true);
+                entitySlime.setSize(-1);
+
+                entityPlayer.playerConnection.sendPacket(new PacketPlayOutSpawnEntityLiving(entityArmorStand));
+                entityPlayer.playerConnection.sendPacket(new PacketPlayOutSpawnEntityLiving(entitySlime));
+                entityPlayer.playerConnection.sendPacket(new PacketPlayOutAttachEntity(0, entityArmorStand, entitySlime));
+                entityPlayer.playerConnection.sendPacket(new PacketPlayOutAttachEntity(0, entitySlime, entityPlayer));
 
                 WrapperPlayServerAttachEntity attachEntityArmorStandPacket = new WrapperPlayServerAttachEntity(new PacketContainer(PacketType.Play.Server.ATTACH_ENTITY));
-                attachEntityArmorStandPacket.setEntityID(armorStandEntityPacket.getEntityID());
-                attachEntityArmorStandPacket.setVehicleId(slimeEntityPacket.getEntityID());
+                attachEntityArmorStandPacket.setEntityID(entityArmorStand.getId());
+                attachEntityArmorStandPacket.setVehicleId(tagPlayer.getBukkitPlayer().getEntityId());
 
-                WrapperPlayServerAttachEntity attachEntitySlimePacket = new WrapperPlayServerAttachEntity(new PacketContainer(PacketType.Play.Server.ATTACH_ENTITY));
+                /*WrapperPlayServerAttachEntity attachEntitySlimePacket = new WrapperPlayServerAttachEntity(new PacketContainer(PacketType.Play.Server.ATTACH_ENTITY));
                 attachEntitySlimePacket.setEntityID(slimeEntityPacket.getEntityID());
-                attachEntitySlimePacket.setVehicleId(tagPlayer.getBukkitPlayer().getEntityId());
+                attachEntitySlimePacket.setVehicleId(tagPlayer.getBukkitPlayer().getEntityId());*/
 
-                armorStandEntityPacket.broadcastPacket();
-                slimeEntityPacket.broadcastPacket();
-                attachEntityArmorStandPacket.broadcastPacket();
-                attachEntitySlimePacket.broadcastPacket();
+                //armorStandEntityPacket.broadcastPacket();
+                //slimeEntityPacket.broadcastPacket();
+                /*attachEntityArmorStandPacket.broadcastPacket();
+                attachEntitySlimePacket.broadcastPacket();*/
             });
         }
     }
