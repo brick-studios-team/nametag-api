@@ -30,7 +30,7 @@ public class TagPlayerManager {
     }
 
     public static List<TagPlayer> getList() {
-        return new ArrayList<>(this.tagPlayerMap.values());
+        return new ArrayList<>(tagPlayerMap.values());
     }
 
     public static void doGlobally(Consumer<TagPlayer> consumer) {

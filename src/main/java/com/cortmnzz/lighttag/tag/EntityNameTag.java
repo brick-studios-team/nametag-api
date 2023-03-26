@@ -1,10 +1,15 @@
 package com.cortmnzz.lighttag.tag;
 
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.events.PacketContainer;
 import com.cortmnzz.lighttag.manager.NameTagManager;
 import com.cortmnzz.lighttag.manager.TagPlayerManager;
+import com.cortmnzz.lighttag.packet.WrapperPlayServerMount;
+import com.cortmnzz.lighttag.packet.WrapperPlayServerSpawnEntityLiving;
 import com.cortmnzz.lighttag.player.TagPlayer;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -34,7 +39,22 @@ public class EntityNameTag {
             TagPlayer tagPlayer = TagPlayerManager.get((Player) target);
 
             this.tagLineList.forEach(line -> {
-                Location location = tagPlayer.getBukkitPlayer().getLocation();
+                WrapperPlayServerSpawnEntityLiving armorStandEntityPacket = new WrapperPlayServerSpawnEntityLiving(new PacketContainer(PacketType.Play.Server.SPAWN_ENTITY_LIVING));
+                armorStandEntityPacket.setEntityID(EntityType.ARMOR_STAND.getTypeId());
+
+                WrapperPlayServerSpawnEntityLiving slimeEntityPacket = new WrapperPlayServerSpawnEntityLiving(new PacketContainer(PacketType.Play.Server.SPAWN_ENTITY_LIVING));
+                slimeEntityPacket.setEntityID(EntityType.SLIME.getTypeId());
+
+                WrapperPlayServerMount mountArmorStandPacket = new WrapperPlayServerMount(new PacketContainer(PacketType.Play.Server.MOUNT));
+                mountArmorStandPacket.setPassengerIds(new int[] { armorStandEntityPacket.getEntityID(), slimeEntityPacket.getEntityID() });
+
+                WrapperPlayServerMount mountSlimePacket = new WrapperPlayServerMount(new PacketContainer(PacketType.Play.Server.MOUNT));
+                mountSlimePacket.setPassengerIds(new int[] { slimeEntityPacket.getEntityID(), tagPlayer.getBukkitPlayer().getEntityId() });
+
+                armorStandEntityPacket.broadcastPacket();
+                slimeEntityPacket.broadcastPacket();
+                mountArmorStandPacket.broadcastPacket();
+                mountSlimePacket.broadcastPacket();
             });
         }
     }
