@@ -19,21 +19,21 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 public class TagPlayerManager {
-    HashMap<UUID, TagPlayer> tagPlayerMap = new HashMap<>();
+    private static final HashMap<UUID, TagPlayer> tagPlayerMap = new HashMap<>();
 
-    public TagPlayer getPlayer(Player bukkitPlayer) {
+    public static TagPlayer get(Player bukkitPlayer) {
         return tagPlayerMap.computeIfAbsent(bukkitPlayer.getUniqueId(), uuid -> new TagPlayer(bukkitPlayer));
     }
 
-    public void removePlayer(Player bukkitPlayer) {
+    public static void remove(Player bukkitPlayer) {
         tagPlayerMap.remove(bukkitPlayer.getUniqueId());
     }
 
-    public List<TagPlayer> getList() {
+    public static List<TagPlayer> getList() {
         return new ArrayList<>(this.tagPlayerMap.values());
     }
 
-    public void doGlobally(Consumer<TagPlayer> consumer) {
+    public static void doGlobally(Consumer<TagPlayer> consumer) {
         getList().forEach(consumer);
     }
 }
