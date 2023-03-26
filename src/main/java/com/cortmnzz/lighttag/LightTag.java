@@ -1,7 +1,8 @@
 package com.cortmnzz.lighttag;
 
 import com.comphenix.protocol.ProtocolLibrary;
-import com.cortmnzz.lighttag.listener.SpawnEntityLivingPacketListener;
+import com.cortmnzz.lighttag.listeners.bukkit.PlayerJoinListener;
+import com.cortmnzz.lighttag.listeners.packet.SpawnEntityLivingPacketListener;
 import com.cortmnzz.lighttag.listeners.bukkit.PlayerMoveListener;
 import com.cortmnzz.lighttag.listeners.bukkit.PlayerQuitListener;
 import com.cortmnzz.lighttag.listeners.custom.PlayerHideListener;
@@ -17,6 +18,7 @@ public final class LightTag extends JavaPlugin {
     public void onEnable() {
         instance = this;
 
+        this.getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
         this.getServer().getPluginManager().registerEvents(new PlayerQuitListener(), this);
         this.getServer().getPluginManager().registerEvents(new PlayerMoveListener(), this);
 

@@ -8,7 +8,7 @@
  * @created : 26/03/2023
  */
 
-package com.cortmnzz.lighttag.listener;
+package com.cortmnzz.lighttag.listeners.packet;
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.ListenerPriority;
