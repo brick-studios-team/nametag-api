@@ -57,11 +57,11 @@ public class EntityNameTag {
                 entityPlayer.playerConnection.sendPacket(new PacketPlayOutSpawnEntityLiving(entityArmorStand));
             });
 
-            teleport(target);
+            teleport();
         }
     }
 
-    public void teleport(Entity target) {
+    public void teleport() {
         for (int index = 0; index < this.entityArmorStandList.size(); index++) {
             Location location = this.entity.getLocation().add(0, index * 0.5, 0);
 
@@ -75,7 +75,9 @@ public class EntityNameTag {
                     (byte) (location.getPitch() * 256.0f / 360.0f),
                     true);
 
-            ((CraftPlayer) target).getHandle().playerConnection.sendPacket(teleportPacket);
+            TagPlayerManager.doGlobally(target -> {
+                ((CraftPlayer) target.getBukkitPlayer()).getHandle().playerConnection.sendPacket(teleportPacket);
+            });
         }
     }
 }

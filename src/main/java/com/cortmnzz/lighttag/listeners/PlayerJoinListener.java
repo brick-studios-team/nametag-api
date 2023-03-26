@@ -1,7 +1,8 @@
 package com.cortmnzz.lighttag.listeners;
 
 import com.cortmnzz.lighttag.manager.NameTagManager;
-import org.bukkit.entity.Player;
+import com.cortmnzz.lighttag.manager.TagPlayerManager;
+import com.cortmnzz.lighttag.player.TagPlayer;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -9,8 +10,8 @@ import org.bukkit.event.player.PlayerJoinEvent;
 public class PlayerJoinListener implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
-        Player player = event.getPlayer();
+        TagPlayer tagPlayer = TagPlayerManager.get(event.getPlayer());
 
-        NameTagManager.get(player).addTagLine(target -> "example").applyAll();
+        NameTagManager.get(tagPlayer.getBukkitPlayer()).addTagLine(target -> "example").addTagLine(target -> "example2").applyAll();
     }
 }
