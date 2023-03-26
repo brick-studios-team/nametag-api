@@ -9,15 +9,15 @@
 
 package com.cortmnzz.lighttag.player;
 
+import com.cortmnzz.lighttag.tag.EntityNameTag;
 import lombok.Setter;
 import lombok.Getter;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 public class TagPlayer {
     @Getter private final Player bukkitPlayer;
 
-    @Getter @Setter private Entity entity;
+    @Getter @Setter private EntityNameTag entityNameTag;
 
     public TagPlayer(Player bukkitPlayer) {
         this.bukkitPlayer = bukkitPlayer;
