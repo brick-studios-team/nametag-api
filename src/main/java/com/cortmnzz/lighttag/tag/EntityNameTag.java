@@ -6,6 +6,7 @@ import com.cortmnzz.lighttag.player.TagPlayer;
 import lombok.Getter;
 import net.minecraft.server.v1_8_R3.EntityArmorStand;
 import net.minecraft.server.v1_8_R3.EntityPlayer;
+import net.minecraft.server.v1_8_R3.PacketPlayOutEntityTeleport;
 import net.minecraft.server.v1_8_R3.PacketPlayOutSpawnEntityLiving;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
@@ -18,8 +19,10 @@ import java.util.List;
 import java.util.function.Function;
 
 public class EntityNameTag {
-    @Getter private final Entity entity;
-    @Getter private final List<EntityArmorStand> entityArmorStandList;
+    @Getter
+    private final Entity entity;
+    @Getter
+    private final List<EntityArmorStand> entityArmorStandList;
     private final List<TagLine> tagLineList;
 
     public EntityNameTag(Entity entity) {
@@ -54,15 +57,25 @@ public class EntityNameTag {
                 entityPlayer.playerConnection.sendPacket(new PacketPlayOutSpawnEntityLiving(entityArmorStand));
             });
 
-            teleport();
+            teleport(target);
         }
     }
-    public void teleport() {
+
+    public void teleport(Entity target) {
         for (int index = 0; index < this.entityArmorStandList.size(); index++) {
             Location location = this.entity.getLocation().add(0, index * 0.5, 0);
 
             EntityArmorStand entityArmorStand = this.entityArmorStandList.get(index);
-            entityArmorStand.setLocation(location.getX(), location.getY(), location.getZ(), 0, 0);
+
+            PacketPlayOutEntityTeleport teleportPacket = new PacketPlayOutEntityTeleport(entityArmorStand.getId(),
+                    (int) (location.getX() * 32.0),
+                    (int) (location.getY() * 32.0),
+                    (int) (location.getZ() * 32.0),
+                    (byte) (location.getYaw() * 256.0f / 360.0f),
+                    (byte) (location.getPitch() * 256.0f / 360.0f),
+                    true);
+
+            ((CraftPlayer) target).getHandle().playerConnection.sendPacket(teleportPacket);
         }
     }
 }
