@@ -66,8 +66,6 @@ public class EntityNameTag {
     }
 
     public void apply(Entity target) {
-        Collections.reverse(this.tagLineList);
-
         if (target instanceof Player) {
             TagPlayer tagPlayerTarget = TagPlayerManager.get((Player) target);
             EntityPlayer entityPlayer = ((CraftPlayer) tagPlayerTarget.getBukkitPlayer()).getHandle();
@@ -79,7 +77,9 @@ public class EntityNameTag {
             this.bukkitTeam.addEntry(this.tagPlayer.getName());
             tagPlayerTarget.getBukkitPlayer().setScoreboard(scoreboard);
 
-            this.tagLineList.forEach(line -> {
+            new ArrayList<TagLine>(this.tagLineList) {{
+                Collections.reverse(this);
+            }}.forEach(line -> {
                 EntityArmorStand entityArmorStand = new EntityArmorStand(((CraftWorld) tagPlayerTarget.getBukkitPlayer().getWorld()).getHandle());
                 entityArmorStand.setInvisible(true);
                 entityArmorStand.setCustomNameVisible(true);
