@@ -20,14 +20,14 @@ import java.util.List;
 import java.util.function.Function;
 
 public class EntityNameTag {
-    @Getter private final Entity entity;
+    @Getter private final TagPlayer tagPlayer;
     @Getter private final List<EntityArmorStand> entityArmorStandList;
     private final List<TagLine> tagLineList;
     private final List<TagPlayer> viewerList;
     private Team bukkitTeam;
 
-    public EntityNameTag(Entity entity) {
-        this.entity = entity;
+    public EntityNameTag(TagPlayer tagPlayer) {
+        this.tagPlayer = tagPlayer;
         this.entityArmorStandList = new ArrayList<>();
         this.tagLineList = new ArrayList<>();
         this.viewerList = new ArrayList<>();
@@ -69,22 +69,22 @@ public class EntityNameTag {
         Collections.reverse(this.tagLineList);
 
         if (target instanceof Player) {
-            TagPlayer tagPlayer = TagPlayerManager.get((Player) target);
-            EntityPlayer entityPlayer = ((CraftPlayer) tagPlayer.getBukkitPlayer()).getHandle();
-            tagPlayer.setEntityNameTag(this);
+            TagPlayer tagPlayerTarget = TagPlayerManager.get((Player) target);
+            EntityPlayer entityPlayer = ((CraftPlayer) tagPlayerTarget.getBukkitPlayer()).getHandle();
+            this.tagPlayer.setEntityNameTag(this);
 
             Scoreboard scoreboard = LightTag.getInstance().getServer().getScoreboardManager().getNewScoreboard();
-            this.bukkitTeam = scoreboard.registerNewTeam(tagPlayer.getName());
+            this.bukkitTeam = scoreboard.registerNewTeam(tagPlayerTarget.getName());
             this.bukkitTeam.setNameTagVisibility(NameTagVisibility.NEVER);
-            this.bukkitTeam.addEntry(this.entity.getName());
-            tagPlayer.getBukkitPlayer().setScoreboard(scoreboard);
+            this.bukkitTeam.addEntry(this.tagPlayer.getName());
+            tagPlayerTarget.getBukkitPlayer().setScoreboard(scoreboard);
 
             this.tagLineList.forEach(line -> {
-                EntityArmorStand entityArmorStand = new EntityArmorStand(((CraftWorld) tagPlayer.getBukkitPlayer().getWorld()).getHandle());
+                EntityArmorStand entityArmorStand = new EntityArmorStand(((CraftWorld) tagPlayerTarget.getBukkitPlayer().getWorld()).getHandle());
                 entityArmorStand.setInvisible(true);
                 entityArmorStand.setCustomNameVisible(true);
                 entityArmorStand.setSmall(true);
-                entityArmorStand.setCustomName(line.getText().apply(tagPlayer.getBukkitPlayer()));
+                entityArmorStand.setCustomName(line.getText().apply(tagPlayerTarget.getBukkitPlayer()));
                 this.entityArmorStandList.add(entityArmorStand);
 
                 entityPlayer.playerConnection.sendPacket(new PacketPlayOutSpawnEntityLiving(entityArmorStand));
@@ -96,7 +96,7 @@ public class EntityNameTag {
 
     public void teleport() {
         for (int index = 0; index < this.entityArmorStandList.size(); index++) {
-            Location location = this.entity.getLocation().add(0, 0.8, 0).add(0, index * 0.3, 0);
+            Location location = this.tagPlayer.getBukkitPlayer().getLocation().add(0, 0.8, 0).add(0, index * 0.3, 0);
 
             EntityArmorStand entityArmorStand = this.entityArmorStandList.get(index);
 
