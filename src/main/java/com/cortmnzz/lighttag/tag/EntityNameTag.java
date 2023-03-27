@@ -129,8 +129,9 @@ public class EntityNameTag {
 
             tagPlayer.getTagRenderList().forEach(tagRender -> {
                 entityPlayer.playerConnection.sendPacket(new PacketPlayOutEntityDestroy(tagRender.getEntityArmorStand().getId()));
-                tagPlayer.removeTagRender(tagRender);
             });
+
+            tagPlayer.getTagRenderList().clear();
         }
     }
 }
