@@ -123,8 +123,12 @@ public class EntityNameTag {
         if (target instanceof Player) {
             TagPlayer tagPlayer = TagPlayerManager.get((Player) target);
             EntityPlayer entityPlayer = ((CraftPlayer) tagPlayer.getBukkitPlayer()).getHandle();
-            this.viewerList.remove(tagPlayer);
 
+            if (!this.viewerList.contains(tagPlayer)) {
+                return;
+            }
+
+            this.viewerList.remove(tagPlayer);
             this.bukkitTeam.unregister();
 
             tagPlayer.getTagRenderList().forEach(tagRender -> {
