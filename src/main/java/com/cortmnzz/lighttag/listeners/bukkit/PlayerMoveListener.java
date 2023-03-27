@@ -14,6 +14,6 @@ public class PlayerMoveListener implements Listener {
     public void onPlayerMove(PlayerMoveEvent event) {
         TagPlayer tagPlayer = TagPlayerManager.get(event.getPlayer());
 
-        Optional.ofNullable(tagPlayer.getEntityNameTag()).ifPresent(EntityNameTag::teleport);
+        Optional.ofNullable(tagPlayer.getEntityNameTag()).ifPresent(EntityNameTag::teleportAll);
     }
 }

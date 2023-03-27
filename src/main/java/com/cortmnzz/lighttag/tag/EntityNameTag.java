@@ -21,14 +21,12 @@ import java.util.function.Function;
 
 public class EntityNameTag {
     @Getter private final TagPlayer tagPlayer;
-    @Getter private final List<EntityArmorStand> entityArmorStandList;
     private final List<TagLine> tagLineList;
-    private final List<TagPlayer> viewerList;
+    @Getter private final List<TagPlayer> viewerList;
     private Team bukkitTeam;
 
     public EntityNameTag(TagPlayer tagPlayer) {
         this.tagPlayer = tagPlayer;
-        this.entityArmorStandList = new ArrayList<>();
         this.tagLineList = new ArrayList<>();
         this.viewerList = new ArrayList<>();
     }
@@ -70,6 +68,7 @@ public class EntityNameTag {
             TagPlayer tagPlayerTarget = TagPlayerManager.get((Player) target);
             EntityPlayer entityPlayer = ((CraftPlayer) tagPlayerTarget.getBukkitPlayer()).getHandle();
             this.tagPlayer.setEntityNameTag(this);
+            this.viewerList.add(tagPlayerTarget);
 
             Scoreboard scoreboard = LightTag.getInstance().getServer().getScoreboardManager().getNewScoreboard();
             this.bukkitTeam = scoreboard.registerNewTeam(tagPlayerTarget.getName());
@@ -85,38 +84,46 @@ public class EntityNameTag {
                 entityArmorStand.setCustomNameVisible(true);
                 entityArmorStand.setSmall(true);
                 entityArmorStand.setCustomName(line.getText().apply(tagPlayerTarget.getBukkitPlayer()));
+
                 tagPlayerTarget.addTagRender(new TagRender(entityArmorStand));
 
                 entityPlayer.playerConnection.sendPacket(new PacketPlayOutSpawnEntityLiving(entityArmorStand));
             });
 
-            teleport();
+            teleport(tagPlayerTarget.getBukkitPlayer());
         }
     }
 
-    public void teleport() {
-        for (int index = 0; index < this.entityArmorStandList.size(); index++) {
-            Location location = this.tagPlayer.getBukkitPlayer().getLocation().add(0, 0.8, 0).add(0, index * 0.3, 0);
+    public void teleport(Entity target) {
+        if (target instanceof Player) {
+            TagPlayer tagPlayer = TagPlayerManager.get((Player) target);
+            EntityPlayer entityPlayer = ((CraftPlayer) tagPlayer.getBukkitPlayer()).getHandle();
 
-            EntityArmorStand entityArmorStand = this.entityArmorStandList.get(index);
+            for (int index = 0; index < this.tagLineList.size(); index++) {
+                Location location = this.tagPlayer.getBukkitPlayer().getLocation().add(0, 0.8, 0).add(0, index * 0.3, 0);
+                EntityArmorStand entityArmorStand = tagPlayer.getTagRenderList().get(index).getEntityArmorStand();
 
-            PacketPlayOutEntityTeleport teleportPacket = new PacketPlayOutEntityTeleport(entityArmorStand.getId(),
-                    (int) (location.getX() * 32.0),
-                    (int) (location.getY() * 32.0),
-                    (int) (location.getZ() * 32.0),
-                    (byte) (location.getYaw() * 256.0f / 360.0f),
-                    (byte) (location.getPitch() * 256.0f / 360.0f),
-                    false);
+                PacketPlayOutEntityTeleport teleportPacket = new PacketPlayOutEntityTeleport(entityArmorStand.getId(),
+                        (int) (location.getX() * 32.0),
+                        (int) (location.getY() * 32.0),
+                        (int) (location.getZ() * 32.0),
+                        (byte) (location.getYaw() * 256.0f / 360.0f),
+                        (byte) (location.getPitch() * 256.0f / 360.0f),
+                        false);
 
-            TagPlayerManager.doGlobally(target -> {
-                ((CraftPlayer) target.getBukkitPlayer()).getHandle().playerConnection.sendPacket(teleportPacket);
-            });
+                entityPlayer.playerConnection.sendPacket(teleportPacket);
+            }
         }
     }
+    public void teleportAll() {
+        this.viewerList.stream().map(TagPlayer::getBukkitPlayer).forEach(this::teleport);
+    }
+
     public void destroy(Entity target) {
         if (target instanceof Player) {
             TagPlayer tagPlayer = TagPlayerManager.get((Player) target);
             EntityPlayer entityPlayer = ((CraftPlayer) tagPlayer.getBukkitPlayer()).getHandle();
+            this.viewerList.remove(tagPlayer);
 
             this.bukkitTeam.unregister();
 
