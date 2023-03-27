@@ -85,7 +85,7 @@ public class EntityNameTag {
                 entityArmorStand.setCustomNameVisible(true);
                 entityArmorStand.setSmall(true);
                 entityArmorStand.setCustomName(line.getText().apply(tagPlayerTarget.getBukkitPlayer()));
-                this.entityArmorStandList.add(entityArmorStand);
+                tagPlayerTarget.addTagRender(new TagRender(entityArmorStand));
 
                 entityPlayer.playerConnection.sendPacket(new PacketPlayOutSpawnEntityLiving(entityArmorStand));
             });
@@ -106,7 +106,7 @@ public class EntityNameTag {
                     (int) (location.getZ() * 32.0),
                     (byte) (location.getYaw() * 256.0f / 360.0f),
                     (byte) (location.getPitch() * 256.0f / 360.0f),
-                    true);
+                    false);
 
             TagPlayerManager.doGlobally(target -> {
                 ((CraftPlayer) target.getBukkitPlayer()).getHandle().playerConnection.sendPacket(teleportPacket);
@@ -120,8 +120,9 @@ public class EntityNameTag {
 
             this.bukkitTeam.unregister();
 
-            this.entityArmorStandList.forEach(entityArmorStand -> {
-                entityPlayer.playerConnection.sendPacket(new PacketPlayOutEntityDestroy(entityArmorStand.getId()));
+            tagPlayer.getTagRenderList().forEach(tagRender -> {
+                entityPlayer.playerConnection.sendPacket(new PacketPlayOutEntityDestroy(tagRender.getEntityArmorStand().getId()));
+                tagPlayer.removeTagRender(tagRender);
             });
         }
     }

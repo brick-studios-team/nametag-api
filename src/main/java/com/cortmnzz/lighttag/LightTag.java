@@ -1,8 +1,6 @@
 package com.cortmnzz.lighttag;
 
-import com.comphenix.protocol.ProtocolLibrary;
 import com.cortmnzz.lighttag.listeners.bukkit.PlayerJoinListener;
-import com.cortmnzz.lighttag.listeners.packet.SpawnEntityLivingPacketListener;
 import com.cortmnzz.lighttag.listeners.bukkit.PlayerMoveListener;
 import com.cortmnzz.lighttag.listeners.bukkit.PlayerQuitListener;
 import com.cortmnzz.lighttag.listeners.custom.PlayerHideListener;

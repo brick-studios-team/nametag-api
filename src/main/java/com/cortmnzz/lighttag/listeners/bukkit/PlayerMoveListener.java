@@ -10,7 +10,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import java.util.Optional;
 
 public class PlayerMoveListener implements Listener {
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onPlayerMove(PlayerMoveEvent event) {
         TagPlayer tagPlayer = TagPlayerManager.get(event.getPlayer());
 
