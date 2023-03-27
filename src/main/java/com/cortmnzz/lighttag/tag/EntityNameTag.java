@@ -67,6 +67,11 @@ public class EntityNameTag {
         if (target instanceof Player) {
             TagPlayer tagPlayerTarget = TagPlayerManager.get((Player) target);
             EntityPlayer entityPlayer = ((CraftPlayer) tagPlayerTarget.getBukkitPlayer()).getHandle();
+
+            if (!tagPlayer.getBukkitPlayer().canSee(tagPlayerTarget.getBukkitPlayer())) {
+                return;
+            }
+
             this.tagPlayer.setEntityNameTag(this);
             this.viewerList.add(tagPlayerTarget);
 
