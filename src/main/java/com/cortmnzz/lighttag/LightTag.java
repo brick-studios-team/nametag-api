@@ -26,7 +26,7 @@ public final class LightTag extends JavaPlugin {
         this.getServer().getPluginManager().registerEvents(new PlayerHideListener(), this);
 
         //ProtocolLibrary.getProtocolManager().addPacketListener(new MovePacketListener());
-        ProtocolLibrary.getProtocolManager().addPacketListener(new SpawnEntityLivingPacketListener());
+        //ProtocolLibrary.getProtocolManager().addPacketListener(new SpawnEntityLivingPacketListener());
     }
 
     @Override

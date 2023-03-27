@@ -1,5 +1,6 @@
 package com.cortmnzz.lighttag.tag;
 
+import com.cortmnzz.lighttag.LightTag;
 import com.cortmnzz.lighttag.manager.TagPlayerManager;
 import com.cortmnzz.lighttag.player.TagPlayer;
 import lombok.Getter;
@@ -9,6 +10,9 @@ import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.NameTagVisibility;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.Team;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,7 +24,7 @@ public class EntityNameTag {
     @Getter private final List<EntityArmorStand> entityArmorStandList;
     private final List<TagLine> tagLineList;
     private final List<TagPlayer> viewerList;
-    private ScoreboardTeam scoreboardTeam;
+    private Team bukkitTeam;
 
     public EntityNameTag(Entity entity) {
         this.entity = entity;
@@ -69,10 +73,11 @@ public class EntityNameTag {
             EntityPlayer entityPlayer = ((CraftPlayer) tagPlayer.getBukkitPlayer()).getHandle();
             tagPlayer.setEntityNameTag(this);
 
-            Scoreboard scoreboard = entityPlayer.getWorld().getScoreboard();
-            this.scoreboardTeam = scoreboard.createTeam(tagPlayer.getName());
-            this.scoreboardTeam.setNameTagVisibility(ScoreboardTeamBase.EnumNameTagVisibility.NEVER);
-            this.scoreboardTeam.getPlayerNameSet().add(entityPlayer.getName());
+            Scoreboard scoreboard = LightTag.getInstance().getServer().getScoreboardManager().getNewScoreboard();
+            this.bukkitTeam = scoreboard.registerNewTeam(tagPlayer.getName());
+            this.bukkitTeam.setNameTagVisibility(NameTagVisibility.NEVER);
+            this.bukkitTeam.addEntry(this.entity.getName());
+            tagPlayer.getBukkitPlayer().setScoreboard(scoreboard);
 
             this.tagLineList.forEach(line -> {
                 EntityArmorStand entityArmorStand = new EntityArmorStand(((CraftWorld) tagPlayer.getBukkitPlayer().getWorld()).getHandle());
@@ -82,7 +87,6 @@ public class EntityNameTag {
                 entityArmorStand.setCustomName(line.getText().apply(tagPlayer.getBukkitPlayer()));
                 this.entityArmorStandList.add(entityArmorStand);
 
-                entityPlayer.playerConnection.sendPacket(new PacketPlayOutScoreboardTeam(this.scoreboardTeam, 0));
                 entityPlayer.playerConnection.sendPacket(new PacketPlayOutSpawnEntityLiving(entityArmorStand));
             });
 
@@ -114,11 +118,9 @@ public class EntityNameTag {
             TagPlayer tagPlayer = TagPlayerManager.get((Player) target);
             EntityPlayer entityPlayer = ((CraftPlayer) tagPlayer.getBukkitPlayer()).getHandle();
 
-            Scoreboard scoreboard = entityPlayer.getWorld().getScoreboard();
-            scoreboard.removeTeam(this.scoreboardTeam);
+            this.bukkitTeam.unregister();
 
             this.entityArmorStandList.forEach(entityArmorStand -> {
-                entityPlayer.playerConnection.sendPacket(new PacketPlayOutScoreboardTeam(this.scoreboardTeam, 1));
                 entityPlayer.playerConnection.sendPacket(new PacketPlayOutEntityDestroy(entityArmorStand.getId()));
             });
         }
