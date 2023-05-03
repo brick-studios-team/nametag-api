@@ -18,80 +18,55 @@ import java.util.function.Function;
 public class EntityNameTag {
     @Getter private final TagPlayer tagPlayer;
     private final List<TagLine> tagLineList;
-    @Getter private final HashMap<TagPlayer, TagViewer> viewerMap;
-    @Getter private final List<TagRender> tagRenderList;
+    @Getter private final HashMap<TagPlayer, TagRender> tagRenderMap;
 
     public EntityNameTag(TagPlayer tagPlayer) {
         this.tagPlayer = tagPlayer;
         this.tagLineList = new ArrayList<>();
-        this.viewerMap = new HashMap<>();
-        this.tagRenderList = new ArrayList<>();
+        this.tagRenderMap = new HashMap<>();
     }
 
     public EntityNameTag addTagLine(Function<Player, String> function) {
         this.tagLineList.add(new TagLine(function));
         return this;
     }
-
-    public void applyAll(TagPlayer tagPlayer) {
-        TagPlayerManager.doGlobally(tagPlayer, target -> apply(target.getBukkitPlayer()));
-    }
-
-    public void apply(List<TagPlayer> tagPlayerList) {
-        tagPlayerList.forEach(target -> apply(target.getBukkitPlayer()));
-    }
-
-    public void destroyAll(List<TagPlayer> tagPlayerList) {
-        this.viewerMap.keySet().forEach(target -> destroy(target.getBukkitPlayer()));
-    }
-
     public void destroyAll(TagPlayer tagPlayer) {
         TagPlayerManager.doGlobally(tagPlayer, target -> destroy(target.getBukkitPlayer()));
     }
-
-    public void addViewer(TagPlayer tagPlayer) {
-        this.viewerMap.put(tagPlayer, new TagViewer());
-
-        apply(tagPlayer.getBukkitPlayer());
-    }
-    public void removeViewer(TagPlayer tagPlayer) {
-        this.viewerMap.remove(tagPlayer);
-
-        destroy(tagPlayer.getBukkitPlayer());
-    }
-
     public void apply(Entity target) {
         if (target instanceof Player) {
-            TagPlayer tagPlayerTarget = TagPlayerManager.get((Player) target);
-            EntityPlayer entityPlayer = ((CraftPlayer) tagPlayerTarget.getBukkitPlayer()).getHandle();
+            TagPlayer tagPlayer = TagPlayerManager.get((Player) target);
+            EntityPlayer entityPlayer = ((CraftPlayer) tagPlayer.getBukkitPlayer()).getHandle();
 
-            if (!tagPlayer.getBukkitPlayer().canSee(tagPlayerTarget.getBukkitPlayer())) {
+            if (!this.tagPlayer.getBukkitPlayer().canSee(tagPlayer.getBukkitPlayer())) {
                 return;
             }
 
+            this.tagRenderMap.put(tagPlayer, new TagRender());
+
             this.tagPlayer.setEntityNameTag(this);
 
-            Team team = tagPlayer.getBukkitScoreboard().registerNewTeam(tagPlayerTarget.getName());
+            Team team = tagPlayer.getBukkitScoreboard().registerNewTeam(tagPlayer.getName());
             team.setNameTagVisibility(NameTagVisibility.NEVER);
             team.addEntry(this.tagPlayer.getName());
 
-            this.viewerMap.get(tagPlayerTarget).setBukkitTeam(team);
+            this.tagRenderMap.get(tagPlayer).setTeam(team);
 
             new ArrayList<TagLine>(this.tagLineList) {{
                 Collections.reverse(this);
             }}.forEach(line -> {
-                EntityArmorStand entityArmorStand = new EntityArmorStand(((CraftWorld) tagPlayerTarget.getBukkitPlayer().getWorld()).getHandle());
+                EntityArmorStand entityArmorStand = new EntityArmorStand(((CraftWorld) tagPlayer.getBukkitPlayer().getWorld()).getHandle());
                 entityArmorStand.setInvisible(true);
                 entityArmorStand.setCustomNameVisible(true);
                 entityArmorStand.setSmall(true);
-                entityArmorStand.setCustomName(line.getText().apply(tagPlayerTarget.getBukkitPlayer()));
+                entityArmorStand.setCustomName(line.getText().apply(tagPlayer.getBukkitPlayer()));
 
-                this.tagRenderList.add(new TagRender(entityArmorStand, team));
+                this.tagRenderMap.get(tagPlayer).getEntityArmorStandList().add(entityArmorStand);
 
                 entityPlayer.playerConnection.sendPacket(new PacketPlayOutSpawnEntityLiving(entityArmorStand));
             });
 
-            teleport(tagPlayerTarget.getBukkitPlayer());
+            teleport(tagPlayer.getBukkitPlayer());
         }
     }
 
@@ -100,9 +75,9 @@ public class EntityNameTag {
             TagPlayer tagPlayer = TagPlayerManager.get((Player) target);
             EntityPlayer entityPlayer = ((CraftPlayer) tagPlayer.getBukkitPlayer()).getHandle();
 
-            for (int index = 0; index < this.tagRenderList.size(); index++) {
+            for (int index = 0; index < this.tagRenderMap.get(tagPlayer).getEntityArmorStandList().size(); index++) {
                 Location location = this.tagPlayer.getBukkitPlayer().getLocation().add(0, 0.8, 0).add(0, index * 0.3, 0);
-                EntityArmorStand entityArmorStand = this.tagRenderList.get(index).getEntityArmorStand();
+                EntityArmorStand entityArmorStand = this.tagRenderMap.get(tagPlayer).getEntityArmorStandList().get(index);
 
                 PacketPlayOutEntityTeleport teleportPacket = new PacketPlayOutEntityTeleport(entityArmorStand.getId(),
                         (int) (location.getX() * 32.0),
@@ -117,7 +92,7 @@ public class EntityNameTag {
         }
     }
     public void teleportAll() {
-        this.viewerMap.keySet().stream().map(TagPlayer::getBukkitPlayer).forEach(this::teleport);
+        this.tagRenderMap.keySet().stream().map(TagPlayer::getBukkitPlayer).forEach(this::teleport);
     }
 
     public void destroy(Entity target) {
@@ -125,18 +100,18 @@ public class EntityNameTag {
             TagPlayer tagPlayer = TagPlayerManager.get((Player) target);
             EntityPlayer entityPlayer = ((CraftPlayer) tagPlayer.getBukkitPlayer()).getHandle();
 
-            if (!Optional.ofNullable(this.viewerMap.get(tagPlayer)).isPresent()) {
+            if (!Optional.ofNullable(this.tagRenderMap.get(tagPlayer)).isPresent()) {
                 return;
             }
 
-            this.tagRenderList.forEach(tagRender -> {
-                entityPlayer.playerConnection.sendPacket(new PacketPlayOutEntityDestroy(tagRender.getEntityArmorStand().getId()));
+            this.tagRenderMap.remove(tagPlayer);
+
+            this.tagRenderMap.get(tagPlayer).getEntityArmorStandList().forEach(armorStand -> {
+                entityPlayer.playerConnection.sendPacket(new PacketPlayOutEntityDestroy(armorStand.getId()));
             });
 
-            this.viewerMap.get(tagPlayer).getBukkitTeam().unregister();
-            this.viewerMap.remove(tagPlayer);
-
-            tagPlayer.getEntityNameTag().getTagRenderList().clear();
+            this.tagRenderMap.get(tagPlayer).getTeam().unregister();
+            this.tagRenderMap.remove(tagPlayer);
         }
     }
 }

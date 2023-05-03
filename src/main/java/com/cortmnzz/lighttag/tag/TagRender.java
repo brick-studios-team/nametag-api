@@ -10,16 +10,17 @@
 
 package com.cortmnzz.lighttag.tag;
 
-import lombok.Getter;
+import lombok.Data;
 import net.minecraft.server.v1_8_R3.EntityArmorStand;
 import org.bukkit.scoreboard.Team;
 
-public class TagRender {
-    @Getter private final EntityArmorStand entityArmorStand;
-    @Getter private final Team team;
+import java.util.List;
 
-    public TagRender(EntityArmorStand entityArmorStand, Team team) {
-        this.entityArmorStand = entityArmorStand;
-        this.team = team;
+@Data
+public class TagRender {
+    private List<EntityArmorStand> entityArmorStandList;
+    private Team team;
+
+    public TagRender() {
     }
 }
