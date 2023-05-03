@@ -30,6 +30,19 @@ public class EntityNameTag {
         this.tagLineList.add(new TagLine(function));
         return this;
     }
+
+    public void applyAll(TagPlayer tagPlayer) {
+        TagPlayerManager.doGlobally(tagPlayer, target -> apply(target.getBukkitPlayer()));
+    }
+
+    public void apply(List<TagPlayer> tagPlayerList) {
+        tagPlayerList.forEach(target -> apply(target.getBukkitPlayer()));
+    }
+
+    public void destroyAll(List<TagPlayer> tagPlayerList) {
+        this.tagRenderMap.keySet().forEach(target -> destroy(target.getBukkitPlayer()));
+    }
+
     public void destroyAll(TagPlayer tagPlayer) {
         TagPlayerManager.doGlobally(tagPlayer, target -> destroy(target.getBukkitPlayer()));
     }
@@ -91,6 +104,7 @@ public class EntityNameTag {
             }
         }
     }
+
     public void teleportAll() {
         this.tagRenderMap.keySet().stream().map(TagPlayer::getBukkitPlayer).forEach(this::teleport);
     }
@@ -104,14 +118,13 @@ public class EntityNameTag {
                 return;
             }
 
-            this.tagRenderMap.remove(tagPlayer);
-
             this.tagRenderMap.get(tagPlayer).getEntityArmorStandList().forEach(armorStand -> {
                 entityPlayer.playerConnection.sendPacket(new PacketPlayOutEntityDestroy(armorStand.getId()));
             });
 
             this.tagRenderMap.get(tagPlayer).getTeam().unregister();
-            this.tagRenderMap.remove(tagPlayer);
+
+            tagPlayer.getEntityNameTag().getTagRenderMap().remove(this.tagPlayer);
         }
     }
 }

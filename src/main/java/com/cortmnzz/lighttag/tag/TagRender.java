@@ -14,6 +14,7 @@ import lombok.Data;
 import net.minecraft.server.v1_8_R3.EntityArmorStand;
 import org.bukkit.scoreboard.Team;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -22,5 +23,6 @@ public class TagRender {
     private Team team;
 
     public TagRender() {
+        this.entityArmorStandList = new ArrayList<>();
     }
 }

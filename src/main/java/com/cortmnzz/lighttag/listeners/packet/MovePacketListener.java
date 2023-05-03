@@ -30,6 +30,6 @@ public class MovePacketListener extends PacketAdapter {
     public void onPacketReceiving(PacketEvent event) {
         TagPlayer tagPlayer = TagPlayerManager.get(event.getPlayer());
 
-        Optional.ofNullable(tagPlayer.getEntityNameTag()).ifPresent(EntityNameTag::teleportAll);
+        //Optional.ofNullable(tagPlayer.getEntityNameTag()).ifPresent(EntityNameTag::teleportAll);
     }
 }
