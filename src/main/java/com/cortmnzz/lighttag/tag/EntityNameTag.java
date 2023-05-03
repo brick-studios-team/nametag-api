@@ -1,6 +1,5 @@
 package com.cortmnzz.lighttag.tag;
 
-import com.cortmnzz.lighttag.LightTag;
 import com.cortmnzz.lighttag.manager.TagPlayerManager;
 import com.cortmnzz.lighttag.player.TagPlayer;
 import lombok.Getter;
@@ -11,24 +10,22 @@ import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.NameTagVisibility;
-import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.function.Function;
 
 public class EntityNameTag {
     @Getter private final TagPlayer tagPlayer;
     private final List<TagLine> tagLineList;
-    @Getter private final List<TagPlayer> viewerList;
-    private Team bukkitTeam;
+    @Getter private final HashMap<TagPlayer, TagViewer> viewerMap;
+    @Getter private final List<TagRender> tagRenderList;
 
     public EntityNameTag(TagPlayer tagPlayer) {
         this.tagPlayer = tagPlayer;
         this.tagLineList = new ArrayList<>();
-        this.viewerList = new ArrayList<>();
+        this.viewerMap = new HashMap<>();
+        this.tagRenderList = new ArrayList<>();
     }
 
     public EntityNameTag addTagLine(Function<Player, String> function) {
@@ -45,7 +42,7 @@ public class EntityNameTag {
     }
 
     public void destroyAll(List<TagPlayer> tagPlayerList) {
-        this.viewerList.forEach(target -> destroy(target.getBukkitPlayer()));
+        this.viewerMap.keySet().forEach(target -> destroy(target.getBukkitPlayer()));
     }
 
     public void destroyAll(TagPlayer tagPlayer) {
@@ -53,12 +50,12 @@ public class EntityNameTag {
     }
 
     public void addViewer(TagPlayer tagPlayer) {
-        this.viewerList.add(tagPlayer);
+        this.viewerMap.put(tagPlayer, new TagViewer());
 
         apply(tagPlayer.getBukkitPlayer());
     }
     public void removeViewer(TagPlayer tagPlayer) {
-        this.viewerList.remove(tagPlayer);
+        this.viewerMap.remove(tagPlayer);
 
         destroy(tagPlayer.getBukkitPlayer());
     }
@@ -73,13 +70,12 @@ public class EntityNameTag {
             }
 
             this.tagPlayer.setEntityNameTag(this);
-            this.viewerList.add(tagPlayerTarget);
 
-            Scoreboard scoreboard = LightTag.getInstance().getServer().getScoreboardManager().getNewScoreboard();
-            this.bukkitTeam = scoreboard.registerNewTeam(tagPlayerTarget.getName());
-            this.bukkitTeam.setNameTagVisibility(NameTagVisibility.NEVER);
-            this.bukkitTeam.addEntry(this.tagPlayer.getName());
-            tagPlayerTarget.getBukkitPlayer().setScoreboard(scoreboard);
+            Team team = tagPlayer.getBukkitScoreboard().registerNewTeam(tagPlayerTarget.getName());
+            team.setNameTagVisibility(NameTagVisibility.NEVER);
+            team.addEntry(this.tagPlayer.getName());
+
+            this.viewerMap.get(tagPlayerTarget).setBukkitTeam(team);
 
             new ArrayList<TagLine>(this.tagLineList) {{
                 Collections.reverse(this);
@@ -90,7 +86,7 @@ public class EntityNameTag {
                 entityArmorStand.setSmall(true);
                 entityArmorStand.setCustomName(line.getText().apply(tagPlayerTarget.getBukkitPlayer()));
 
-                tagPlayerTarget.addTagRender(new TagRender(entityArmorStand));
+                this.tagRenderList.add(new TagRender(entityArmorStand, team));
 
                 entityPlayer.playerConnection.sendPacket(new PacketPlayOutSpawnEntityLiving(entityArmorStand));
             });
@@ -104,9 +100,9 @@ public class EntityNameTag {
             TagPlayer tagPlayer = TagPlayerManager.get((Player) target);
             EntityPlayer entityPlayer = ((CraftPlayer) tagPlayer.getBukkitPlayer()).getHandle();
 
-            for (int index = 0; index < this.tagLineList.size(); index++) {
+            for (int index = 0; index < this.tagRenderList.size(); index++) {
                 Location location = this.tagPlayer.getBukkitPlayer().getLocation().add(0, 0.8, 0).add(0, index * 0.3, 0);
-                EntityArmorStand entityArmorStand = tagPlayer.getTagRenderList().get(index).getEntityArmorStand();
+                EntityArmorStand entityArmorStand = this.tagRenderList.get(index).getEntityArmorStand();
 
                 PacketPlayOutEntityTeleport teleportPacket = new PacketPlayOutEntityTeleport(entityArmorStand.getId(),
                         (int) (location.getX() * 32.0),
@@ -121,7 +117,7 @@ public class EntityNameTag {
         }
     }
     public void teleportAll() {
-        this.viewerList.stream().map(TagPlayer::getBukkitPlayer).forEach(this::teleport);
+        this.viewerMap.keySet().stream().map(TagPlayer::getBukkitPlayer).forEach(this::teleport);
     }
 
     public void destroy(Entity target) {
@@ -129,18 +125,18 @@ public class EntityNameTag {
             TagPlayer tagPlayer = TagPlayerManager.get((Player) target);
             EntityPlayer entityPlayer = ((CraftPlayer) tagPlayer.getBukkitPlayer()).getHandle();
 
-            if (!this.viewerList.contains(tagPlayer)) {
+            if (!Optional.ofNullable(this.viewerMap.get(tagPlayer)).isPresent()) {
                 return;
             }
 
-            this.viewerList.remove(tagPlayer);
-            this.bukkitTeam.unregister();
-
-            tagPlayer.getTagRenderList().forEach(tagRender -> {
+            this.tagRenderList.forEach(tagRender -> {
                 entityPlayer.playerConnection.sendPacket(new PacketPlayOutEntityDestroy(tagRender.getEntityArmorStand().getId()));
             });
 
-            tagPlayer.getTagRenderList().clear();
+            this.viewerMap.get(tagPlayer).getBukkitTeam().unregister();
+            this.viewerMap.remove(tagPlayer);
+
+            tagPlayer.getEntityNameTag().getTagRenderList().clear();
         }
     }
 }
