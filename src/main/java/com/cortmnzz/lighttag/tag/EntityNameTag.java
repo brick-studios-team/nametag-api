@@ -118,6 +118,7 @@ public class EntityNameTag {
             });
 
             this.tagRenderMap.get(tagPlayer).getTeam().unregister();
+            this.tagRenderMap.remove(tagPlayer);
         }
     }
 }
