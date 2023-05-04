@@ -24,6 +24,8 @@ public class EntityNameTag {
         this.tagPlayer = tagPlayer;
         this.tagLineList = new ArrayList<>();
         this.tagRenderMap = new HashMap<>();
+
+        this.tagPlayer.setEntityNameTag(this);
     }
 
     public EntityNameTag addTagLine(Function<Player, String> function) {
@@ -35,17 +37,12 @@ public class EntityNameTag {
         TagPlayerManager.doGlobally(tagPlayer, target -> apply(target.getBukkitPlayer()));
     }
 
-    public void apply(List<TagPlayer> tagPlayerList) {
-        tagPlayerList.forEach(target -> apply(target.getBukkitPlayer()));
-    }
-
-    public void destroyAll(List<TagPlayer> tagPlayerList) {
-        this.tagRenderMap.keySet().forEach(target -> destroy(target.getBukkitPlayer()));
-    }
-
     public void destroyAll(TagPlayer tagPlayer) {
         TagPlayerManager.doGlobally(tagPlayer, target -> destroy(target.getBukkitPlayer()));
+        TagPlayerManager.getList().stream().map(target -> target.getEntityNameTag().getTagRenderMap())
+                .filter(list -> list.containsKey(tagPlayer)).forEach(list -> list.remove(tagPlayer));
     }
+
     public void apply(Entity target) {
         if (target instanceof Player) {
             TagPlayer tagPlayer = TagPlayerManager.get((Player) target);
@@ -56,8 +53,6 @@ public class EntityNameTag {
             }
 
             this.tagRenderMap.put(tagPlayer, new TagRender());
-
-            this.tagPlayer.setEntityNameTag(this);
 
             Team team = tagPlayer.getBukkitScoreboard().registerNewTeam(tagPlayer.getName());
             team.setNameTagVisibility(NameTagVisibility.NEVER);
@@ -123,8 +118,6 @@ public class EntityNameTag {
             });
 
             this.tagRenderMap.get(tagPlayer).getTeam().unregister();
-
-            tagPlayer.getEntityNameTag().getTagRenderMap().remove(this.tagPlayer);
         }
     }
 }
