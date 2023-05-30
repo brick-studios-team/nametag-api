@@ -33,9 +33,6 @@ public class TagPlayer {
     public String getName() {
         return this.bukkitPlayer.getName();
     }
-    public void applyAll() {
-        TagPlayerManager.doGlobally(this, target -> target.getEntityNameTag().apply(this.bukkitPlayer));
-    }
     public EntityNameTag setEntityNameTag(EntityNameTag entityNameTag) {
         this.entityNameTag = entityNameTag;
         return this.entityNameTag;

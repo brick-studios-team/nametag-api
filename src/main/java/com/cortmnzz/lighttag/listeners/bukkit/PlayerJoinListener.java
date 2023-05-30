@@ -11,7 +11,5 @@ public class PlayerJoinListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerJoin(PlayerJoinEvent event) {
         TagPlayer tagPlayer = TagPlayerManager.get(event.getPlayer());
-
-        tagPlayer.applyAll();
     }
 }

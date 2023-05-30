@@ -33,12 +33,13 @@ public class EntityNameTag {
         return this;
     }
 
-    public void applyAll(TagPlayer tagPlayer) {
-        TagPlayerManager.doGlobally(tagPlayer, target -> apply(target.getBukkitPlayer()));
+    public void applyAll() {
+        TagPlayerManager.doGlobally(this.tagPlayer, target -> apply(target.getBukkitPlayer()));
+        TagPlayerManager.doGlobally(this.tagPlayer, target -> target.getEntityNameTag().apply(this.tagPlayer.getBukkitPlayer()));
     }
 
-    public void destroyAll(TagPlayer tagPlayer) {
-        TagPlayerManager.doGlobally(tagPlayer, target -> destroy(target.getBukkitPlayer()));
+    public void destroyAll() {
+        TagPlayerManager.doGlobally(this.tagPlayer, target -> destroy(target.getBukkitPlayer()));
         TagPlayerManager.getList().stream().map(target -> target.getEntityNameTag().getTagRenderMap())
                 .filter(list -> list.containsKey(tagPlayer)).forEach(list -> list.remove(tagPlayer));
     }
@@ -52,13 +53,14 @@ public class EntityNameTag {
                 return;
             }
 
-            this.tagRenderMap.put(tagPlayer, new TagRender());
+            TagRender tagRender = new TagRender();
+            this.tagRenderMap.put(tagPlayer, tagRender);
 
-            Team team = tagPlayer.getBukkitScoreboard().registerNewTeam(tagPlayer.getName());
+            Team team = tagPlayer.getBukkitScoreboard().registerNewTeam(this.tagPlayer.getName());
             team.setNameTagVisibility(NameTagVisibility.NEVER);
             team.addEntry(this.tagPlayer.getName());
 
-            this.tagRenderMap.get(tagPlayer).setTeam(team);
+            tagRender.setTeam(team);
 
             new ArrayList<TagLine>(this.tagLineList) {{
                 Collections.reverse(this);
@@ -117,7 +119,9 @@ public class EntityNameTag {
                 entityPlayer.playerConnection.sendPacket(new PacketPlayOutEntityDestroy(armorStand.getId()));
             });
 
-            this.tagRenderMap.get(tagPlayer).getTeam().unregister();
+            TagRender tagRender = this.tagRenderMap.get(tagPlayer);
+            tagRender.getTeam().unregister();
+
             this.tagRenderMap.remove(tagPlayer);
         }
     }
