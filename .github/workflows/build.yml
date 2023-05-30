@@ -22,7 +22,7 @@ jobs:
           java -jar BuildTools.jar --rev 1.8 --compile Spigot
 
       - name: Compile 1.8 spigot version
-        run: clean package
+        run: mvn clean package
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
