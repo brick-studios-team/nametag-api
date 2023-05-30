@@ -34,14 +34,36 @@ public class EntityNameTag {
     }
 
     public void applyAll() {
-        TagPlayerManager.doGlobally(this.tagPlayer, target -> apply(target.getBukkitPlayer()));
-        TagPlayerManager.doGlobally(this.tagPlayer, target -> target.getEntityNameTag().apply(this.tagPlayer.getBukkitPlayer()));
+        applyOtherAll();
+        applyMeAll();
     }
 
     public void destroyAll() {
         TagPlayerManager.doGlobally(this.tagPlayer, target -> destroy(target.getBukkitPlayer()));
         TagPlayerManager.getList().stream().map(target -> target.getEntityNameTag().getTagRenderMap())
                 .filter(list -> list.containsKey(tagPlayer)).forEach(list -> list.remove(tagPlayer));
+    }
+
+    public void applyMeAll() {
+        TagPlayerManager.doGlobally(this.tagPlayer, target -> target.getEntityNameTag().apply(this.tagPlayer.getBukkitPlayer()));
+    }
+
+    public void applyOtherAll() {
+        TagPlayerManager.doGlobally(this.tagPlayer, target -> apply(target.getBukkitPlayer()));
+    }
+
+    public void destroyMeAll() {
+        TagPlayerManager.doGlobally(this.tagPlayer, target -> target.getEntityNameTag().destroy(this.tagPlayer.getBukkitPlayer()));
+    }
+
+    public void updateMeAll() {
+        destroyMeAll();
+        applyMeAll();
+    }
+
+    public void updateAll() {
+        destroyAll();
+        applyAll();
     }
 
     public void apply(Entity target) {
