@@ -5,12 +5,6 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Install dependencies and build
-
   run:
     runs-on: ubuntu-latest
     steps:
@@ -21,70 +15,14 @@ jobs:
           java-version: 8
           distribution: temurin
 
-      - name: Compile 1.8 spigot version
-        uses: ./
-        with:
-          versions: 1.8
-
-      - uses: actions/setup-java@v3
-        with:
-          java-version: 17
-          distribution: temurin
-
-      - name: Compile latest spigot version
-        uses: ./
-        with:
-          versions: latest
-
-      - name: Compile the same version again (latest)
-        uses: ./
-        with:
-          versions: latest
-
-      - uses: actions/setup-java@v3
-        with:
-          java-version: 8
-          distribution: temurin
-
-      - name: Compile the same version again (1.8)
-        uses: ./
-        with:
-          versions: 1.8
-
-      - name: Upload logs
-        if: ${{ always() }}
-        uses: actions/upload-artifact@v3
-        with:
-          name: logs
-          path: /tmp/SpraxDev-Action-SpigotMC/logs/
-
-  original-run:
-    runs-on: ubuntu-latest
-    steps:
-
-      - uses: actions/setup-java@v3
-        with:
-
-          java-version: 8
-          distribution: temurin
-
       - name: Run original Spigot-BuildTools (1.8)
 
         run: |
           wget https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar -O BuildTools.jar
           java -jar BuildTools.jar --rev 1.8 --compile Spigot
 
-      - uses: actions/setup-java@v3
-        with:
-
-          java-version: 17
-          distribution: temurin
-
-      - name: Run original Spigot-BuildTools (latest)
-
-        run: |
-          wget https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar -O BuildTools.jar
-          java -jar BuildTools.jar --rev latest --compile Spigot
+      - name: Compile 1.8 spigot version
+        run: clean package
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
