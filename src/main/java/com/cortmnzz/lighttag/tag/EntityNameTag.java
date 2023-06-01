@@ -34,12 +34,12 @@ public class EntityNameTag {
     }
 
     public void applyAll() {
-        applyAllMe();
-        TagPlayerManager.doGlobally(this.tagPlayer, target -> target.getEntityNameTag().apply(this.tagPlayer.getBukkitPlayer()));
+        TagPlayerManager.doGlobally(this.tagPlayer, target -> apply(target.getBukkitPlayer()));
+        applyMeAll();
     }
 
-    public void applyAllMe() {
-        TagPlayerManager.doGlobally(this.tagPlayer, target -> apply(target.getBukkitPlayer()));
+    public void applyMeAll() {
+        TagPlayerManager.doGlobally(this.tagPlayer, target -> target.getEntityNameTag().apply(this.tagPlayer.getBukkitPlayer()));
     }
 
     public void destroyAll() {
