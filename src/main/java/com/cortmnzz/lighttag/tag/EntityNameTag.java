@@ -34,8 +34,12 @@ public class EntityNameTag {
     }
 
     public void applyAll() {
-        TagPlayerManager.doGlobally(this.tagPlayer, target -> apply(target.getBukkitPlayer()));
+        applyAllMe();
         TagPlayerManager.doGlobally(this.tagPlayer, target -> target.getEntityNameTag().apply(this.tagPlayer.getBukkitPlayer()));
+    }
+
+    public void applyAllMe() {
+        TagPlayerManager.doGlobally(this.tagPlayer, target -> apply(target.getBukkitPlayer()));
     }
 
     public void destroyAll() {
@@ -51,6 +55,10 @@ public class EntityNameTag {
 
             if (!this.tagPlayer.getBukkitPlayer().canSee(tagPlayer.getBukkitPlayer())) {
                 return;
+            }
+
+            if (!Objects.isNull(this.tagRenderMap.get(tagPlayer))) {
+                destroy(target);
             }
 
             TagRender tagRender = new TagRender();
@@ -69,7 +77,6 @@ public class EntityNameTag {
                 entityArmorStand.setInvisible(true);
                 entityArmorStand.setCustomNameVisible(true);
                 entityArmorStand.setSmall(true);
-                entityArmorStand.setCustomName(line.getText().apply(tagPlayer.getBukkitPlayer()));
 
                 this.tagRenderMap.get(tagPlayer).getEntityArmorStandList().add(entityArmorStand);
 
