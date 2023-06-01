@@ -24,8 +24,6 @@ public class EntityNameTag {
         this.tagPlayer = tagPlayer;
         this.tagLineList = new ArrayList<>();
         this.tagRenderMap = new HashMap<>();
-
-        this.tagPlayer.setEntityNameTag(this);
     }
 
     public EntityNameTag addTagLine(Function<Player, String> function) {
@@ -34,6 +32,8 @@ public class EntityNameTag {
     }
 
     public void applyAll() {
+        this.tagPlayer.setEntityNameTag(this);
+
         TagPlayerManager.doGlobally(this.tagPlayer, target -> apply(target.getBukkitPlayer()));
         applyMeAll();
     }
@@ -57,7 +57,7 @@ public class EntityNameTag {
                 return;
             }
 
-            if (!Objects.isNull(this.tagRenderMap.get(tagPlayer))) {
+            if (this.tagRenderMap.containsKey(tagPlayer)) {
                 destroy(target);
             }
 
@@ -77,6 +77,7 @@ public class EntityNameTag {
                 entityArmorStand.setInvisible(true);
                 entityArmorStand.setCustomNameVisible(true);
                 entityArmorStand.setSmall(true);
+                entityArmorStand.setCustomName(line.getText().apply(tagPlayer.getBukkitPlayer()));
 
                 this.tagRenderMap.get(tagPlayer).getEntityArmorStandList().add(entityArmorStand);
 
