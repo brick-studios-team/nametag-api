@@ -67,6 +67,7 @@ public class EntityNameTag {
             Team team = tagPlayer.getBukkitScoreboard().registerNewTeam(this.tagPlayer.getName());
             team.setNameTagVisibility(NameTagVisibility.NEVER);
             team.addEntry(this.tagPlayer.getName());
+            team.setPrefix(this.tagPlayer.getWeight());
 
             tagRender.setTeam(team);
 

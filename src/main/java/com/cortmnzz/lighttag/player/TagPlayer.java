@@ -13,6 +13,7 @@ import com.cortmnzz.lighttag.LightTag;
 import com.cortmnzz.lighttag.manager.TagPlayerManager;
 import com.cortmnzz.lighttag.tag.EntityNameTag;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Scoreboard;
@@ -23,6 +24,7 @@ public class TagPlayer {
 
     @Getter private final Scoreboard bukkitScoreboard;
     @Getter private EntityNameTag entityNameTag;
+    @Getter private int weight;
 
     public TagPlayer(Player bukkitPlayer) {
         this.bukkitPlayer = bukkitPlayer;
@@ -36,5 +38,9 @@ public class TagPlayer {
     public EntityNameTag setEntityNameTag(EntityNameTag entityNameTag) {
         this.entityNameTag = entityNameTag;
         return this.entityNameTag;
+    }
+    public TagPlayer setWeight(int weight) {
+        this.weight = weight;
+        return this;
     }
 }
