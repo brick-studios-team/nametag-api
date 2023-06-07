@@ -20,6 +20,8 @@ import org.bukkit.scoreboard.NameTagVisibility;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
+import java.util.Objects;
+
 @Accessors(chain = true)
 public class TagPlayer {
     @Getter private final Player bukkitPlayer;
@@ -50,5 +52,10 @@ public class TagPlayer {
         this.bukkitPlayer.setScoreboard(LightTag.getInstance().getBukkitScoreboard());
 
         return this;
+    }
+    public void destroy() {
+        if (!Objects.isNull(this.bukkitTeam)) {
+            this.bukkitTeam.unregister();
+        }
     }
 }

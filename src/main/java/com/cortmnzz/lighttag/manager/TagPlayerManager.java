@@ -26,6 +26,8 @@ public class TagPlayerManager {
     }
 
     public static void remove(Player bukkitPlayer) {
+        get(bukkitPlayer).destroy();
+
         tagPlayerMap.remove(bukkitPlayer.getUniqueId());
     }
 
