@@ -24,20 +24,12 @@ import org.bukkit.scoreboard.Team;
 public class TagPlayer {
     @Getter private final Player bukkitPlayer;
 
-    @Getter private final Team bukkitTeam;
+    @Getter private Team bukkitTeam;
     @Getter private EntityNameTag entityNameTag;
     @Getter private int weight;
 
     public TagPlayer(Player bukkitPlayer) {
         this.bukkitPlayer = bukkitPlayer;
-
-        String name = String.join("_", String.format("%03d", 100 - this.weight), this.bukkitPlayer.getName());
-        this.bukkitTeam = LightTag.getInstance().getBukkitScoreboard().registerNewTeam(name.substring(0, Math.min(name.length(), 16)));
-
-        this.bukkitTeam.setNameTagVisibility(NameTagVisibility.NEVER);
-        this.bukkitTeam.addEntry(this.bukkitPlayer.getName());
-
-        this.bukkitPlayer.setScoreboard(LightTag.getInstance().getBukkitScoreboard());
     }
     public String getName() {
         return this.bukkitPlayer.getName();
@@ -48,6 +40,15 @@ public class TagPlayer {
     }
     public TagPlayer setWeight(int weight) {
         this.weight = weight;
+
+        String name = String.join("_", String.format("%03d", 100 - this.weight), this.bukkitPlayer.getName());
+        this.bukkitTeam = LightTag.getInstance().getBukkitScoreboard().registerNewTeam(name.substring(0, Math.min(name.length(), 16)));
+
+        this.bukkitTeam.setNameTagVisibility(NameTagVisibility.NEVER);
+        this.bukkitTeam.addEntry(this.bukkitPlayer.getName());
+
+        this.bukkitPlayer.setScoreboard(LightTag.getInstance().getBukkitScoreboard());
+
         return this;
     }
 }
