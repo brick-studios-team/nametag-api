@@ -44,7 +44,9 @@ public class EntityNameTag {
 
     public void destroyAll() {
         TagPlayerManager.doGlobally(this.tagPlayer, target -> destroy(target.getBukkitPlayer()));
-        TagPlayerManager.getList().stream().map(target -> target.getEntityNameTag().getTagRenderMap())
+        TagPlayerManager.getList().stream()
+                .filter(target -> !Objects.isNull(target.getEntityNameTag()))
+                .map(target -> target.getEntityNameTag().getTagRenderMap())
                 .filter(list -> list.containsKey(tagPlayer)).forEach(list -> list.remove(tagPlayer));
     }
 
@@ -64,10 +66,10 @@ public class EntityNameTag {
             TagRender tagRender = new TagRender();
             this.tagRenderMap.put(tagPlayer, tagRender);
 
-            Team team = tagPlayer.getBukkitScoreboard().registerNewTeam(this.tagPlayer.getName());
+            Team team = tagPlayer.getBukkitScoreboard().registerNewTeam(String.valueOf(this.tagPlayer.getWeight()));
             team.setNameTagVisibility(NameTagVisibility.NEVER);
             team.addEntry(this.tagPlayer.getName());
-            team.setPrefix(this.tagPlayer.getWeight());
+            team.setPrefix(String.valueOf(this.tagPlayer.getWeight()));
 
             tagRender.setTeam(team);
 
