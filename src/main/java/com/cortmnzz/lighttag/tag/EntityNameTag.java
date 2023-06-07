@@ -66,14 +66,6 @@ public class EntityNameTag {
             TagRender tagRender = new TagRender();
             this.tagRenderMap.put(tagPlayer, tagRender);
 
-            String name = String.join("", String.format("%03d", this.tagPlayer.getWeight()), this.tagPlayer.getName());
-            Team team = tagPlayer.getBukkitScoreboard().registerNewTeam(name.substring(0, Math.min(name.length(), 16)));
-            team.setNameTagVisibility(NameTagVisibility.NEVER);
-            team.addEntry(this.tagPlayer.getName());
-            team.setPrefix(String.valueOf(this.tagPlayer.getWeight()));
-
-            tagRender.setTeam(team);
-
             new ArrayList<TagLine>(this.tagLineList) {{
                 Collections.reverse(this);
             }}.forEach(line -> {
@@ -130,9 +122,6 @@ public class EntityNameTag {
             this.tagRenderMap.get(tagPlayer).getEntityArmorStandList().forEach(armorStand -> {
                 entityPlayer.playerConnection.sendPacket(new PacketPlayOutEntityDestroy(armorStand.getId()));
             });
-
-            TagRender tagRender = this.tagRenderMap.get(tagPlayer);
-            tagRender.getTeam().unregister();
 
             this.tagRenderMap.remove(tagPlayer);
         }
