@@ -43,6 +43,10 @@ public class TagPlayer {
     public TagPlayer setWeight(int weight) {
         this.weight = weight;
 
+        if (!Objects.isNull(this.bukkitTeam)) {
+            return this;
+        }
+
         String name = String.join("_", String.format("%03d", 100 - this.weight), this.bukkitPlayer.getName());
         this.bukkitTeam = LightTag.getInstance().getBukkitScoreboard().registerNewTeam(name.substring(0, Math.min(name.length(), 16)));
 
